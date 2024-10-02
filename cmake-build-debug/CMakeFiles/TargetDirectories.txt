@@ -1,3 +1,0 @@
-C:/Users/mathi/OneDrive/Bureau/Cours/C/CLogik/cmake-build-debug/CMakeFiles/CLogik.dir
-C:/Users/mathi/OneDrive/Bureau/Cours/C/CLogik/cmake-build-debug/CMakeFiles/edit_cache.dir
-C:/Users/mathi/OneDrive/Bureau/Cours/C/CLogik/cmake-build-debug/CMakeFiles/rebuild_cache.dir

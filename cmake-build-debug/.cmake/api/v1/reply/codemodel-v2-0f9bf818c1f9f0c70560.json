@@ -49,8 +49,8 @@
 	"kind" : "codemodel",
 	"paths" : 
 	{
-		"build" : "C:/Users/mathi/OneDrive/Bureau/Cours/C/CLogik/cmake-build-debug",
-		"source" : "C:/Users/mathi/OneDrive/Bureau/Cours/C/CLogik"
+		"build" : "C:/Users/mathi/OneDrive/Bureau/CLogik/cmake-build-debug",
+		"source" : "C:/Users/mathi/OneDrive/Bureau/CLogik"
 	},
 	"version" : 
 	{

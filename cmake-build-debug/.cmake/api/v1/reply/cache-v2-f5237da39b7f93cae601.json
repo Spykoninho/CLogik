@@ -11,7 +11,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "C:/Users/mathi/OneDrive/Bureau/Cours/C/CLogik/cmake-build-debug"
+			"value" : "C:/Users/mathi/OneDrive/Bureau/CLogik/cmake-build-debug"
 		},
 		{
 			"name" : "CLogik_IS_TOP_LEVEL",
@@ -35,7 +35,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "C:/Users/mathi/OneDrive/Bureau/Cours/C/CLogik"
+			"value" : "C:/Users/mathi/OneDrive/Bureau/CLogik"
 		},
 		{
 			"name" : "CMAKE_ADDR2LINE",
@@ -91,7 +91,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "c:/Users/mathi/OneDrive/Bureau/Cours/C/CLogik/cmake-build-debug"
+			"value" : "c:/Users/mathi/OneDrive/Bureau/CLogik/cmake-build-debug"
 		},
 		{
 			"name" : "CMAKE_CACHE_MAJOR_VERSION",
@@ -467,7 +467,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "C:/Users/mathi/OneDrive/Bureau/Cours/C/CLogik/cmake-build-debug/CMakeFiles/pkgRedirects"
+			"value" : "C:/Users/mathi/OneDrive/Bureau/CLogik/cmake-build-debug/CMakeFiles/pkgRedirects"
 		},
 		{
 			"name" : "CMAKE_GENERATOR",
@@ -539,7 +539,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "C:/Users/mathi/OneDrive/Bureau/Cours/C/CLogik"
+			"value" : "C:/Users/mathi/OneDrive/Bureau/CLogik"
 		},
 		{
 			"name" : "CMAKE_INSTALL_PREFIX",
