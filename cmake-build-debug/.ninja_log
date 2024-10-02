@@ -1,0 +1,6 @@
+# ninja log v6
+2	65	7495537380245244	CMakeFiles/CLogik.dir/main.c.obj	6b6bb204197f77bd
+3	74	7495537661801295	CMakeFiles/CLogik.dir/lexer.c.obj	9957cc32022445e5
+75	167	7495537662517804	CLogik.exe	729fdbc6d301244d
+9	78	7495538459873410	CMakeFiles/CLogik.dir/lexer.c.obj	9957cc32022445e5
+78	170	7495538460564864	CLogik.exe	729fdbc6d301244d
