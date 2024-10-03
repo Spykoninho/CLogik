@@ -4,12 +4,11 @@
 
 int main(void) {
     Token * token = NULL;
-    token = lexer("x = 10 + y", token);
+    token = lexer("if(a>b){print(a);}", token);
     if (token != NULL) {
         printToken(token);
         free(token);
     }
-    printToken(token);
     return 0;
 }
 

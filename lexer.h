@@ -20,13 +20,13 @@ typedef enum inputType {
 
 typedef struct token {
     Type type;
-    char value;
+    char* value;
     struct token *nextToken;
 }Token;
 
 Token * lexer(char*, Token*);
 char * getType(int);
-Token * addToken(Token *, Type, char);
+Token * addToken(Token *, const Type, const char *);
 void printToken(Token *);
 void freeToken(Token *);
 #endif //LEXER_H

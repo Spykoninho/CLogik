@@ -10,24 +10,25 @@
 // Permet de comprendre les entrées
 Token * lexer(char*string, Token * token) {
     while (*string != '\0') {
+        char stringValue[2] = {*string, '\0'};
         switch (*string) {
             case '(':
-                token = addToken(token, LPAREN, *string);
+                token = addToken(token, LPAREN, stringValue);
                 break;
             case ')':
-                token = addToken(token, RPAREN, *string);
+                token = addToken(token, RPAREN, stringValue);
                 break;
             case '{':
-                token = addToken(token, LBRACE, *string);
+                token = addToken(token, LBRACE, stringValue);
                 break;
             case '}':
-                token = addToken(token, RBRACE, *string);
+                token = addToken(token, RBRACE, stringValue);
                 break;
             case ';':
-                token = addToken(token, SEMICOLON, *string);
+                token = addToken(token, SEMICOLON, stringValue);
                 break;
             case '=':
-                token = addToken(token, ASSIGN, *string);
+                token = addToken(token, ASSIGN, stringValue);
                 break;
             case '<':
             case '>':
@@ -37,22 +38,27 @@ Token * lexer(char*string, Token * token) {
             case '-':
             case '/':
             case '*':
-                token = addToken(token, OPERATOR, *string);
+                token = addToken(token, OPERATOR, stringValue);
         }
-        //char * input = strtok(*string, " ");
-        //if(strlen(input) >= 2) { // pour réconnaitre les if, print, nombres à plusieurs digits...
-            // verif si isDigit
-            // stocker
-            // avancer du strlen
-        //}
         if(*string >= '0' && *string <= '9') {
-            token = addToken(token, NUMBER, *string);
-            string++;
+            char numberString[255]="";
+            while(*string >= '0' && *string <= '9') {
+                char NumberToString[2] = {*string, '\0'};
+                strcat(numberString, NumberToString);
+                *string++;
+            }
+            token = addToken(token, NUMBER, numberString);
             continue;
         }
+
         if(*string >= 'a' && *string <= 'z' || *string >= 'A' && *string <= 'Z') {
-            token = addToken(token, IDENTIFIER, *string);
-            string++;
+            char longString[255]="";
+            while(*string >= 'a' && *string <= 'z' || *string >= 'A' && *string <= 'Z') {
+                char charToString[2] = {*string, '\0'};
+                strcat(longString, charToString);
+                *string++;
+            }
+            token = addToken(token, IDENTIFIER, longString);
             continue;
         }
         string++;
@@ -64,15 +70,16 @@ Token * lexer(char*string, Token * token) {
 void printToken(Token * token) {
     if(token != NULL) {
         printToken(token->nextToken);
-        printf("{type: \"%s\", value: \"%c\"},\n", getType(token->type) ,token->value);
+        printf("{type: \"%s\", value: \"%s\"},\n", getType(token->type) ,token->value);
     }
 }
 
 // Ajouter un token
-Token * addToken(Token * token, const Type type, const char value) {
+Token * addToken(Token * token, const Type type, const char* value) {
     Token * newToken = malloc(sizeof(Token));
     newToken->type = type;
-    newToken->value = value;
+    newToken->value = malloc(sizeof(char) * (strlen(value) + 1));
+    strcpy(newToken->value, value);
     newToken->nextToken = token;
     return newToken;
 }
@@ -108,6 +115,7 @@ char * getType(int type) {
 // Libère les tokens
 void freeToken(Token * token) {
     if(token != NULL) {
+        free(token->value);
         freeToken(token->nextToken);
         free(token);
     }
