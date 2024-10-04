@@ -30,4 +30,6 @@
 
     void printToken(Token *);
 
+    char * tokensToShuttingYardString(Token * token, char * buffer, unsigned int bufferSize, char * shuttingYardString);
+
 #endif //TOKEN_H

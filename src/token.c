@@ -24,6 +24,14 @@ void printToken(Token * token) {
         printf("{type: \"%s\", value: \"%s\"},\n", getType(token->type) ,token->value);
     }
 }
+char * tokensToShuttingYardString(Token * token, char * buffer, unsigned int bufferSize, char * shuttingYardString) {
+    if(token != NULL) {
+        printToken(token->nextToken);
+        // METTRE L'ALGO ICI
+    }else {
+        return "";
+    }
+}
 
 // Libère les tokens
 void freeToken(Token * token) {
