@@ -2,7 +2,8 @@
 // Created by mathi on 01/10/2024.
 //
 
-#include "lexer.h"
+#include "../headers/lexer.h"
+#include "../headers/token.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -66,24 +67,6 @@ Token * lexer(char*string, Token * token) {
     return token;
 }
 
-// Print un token à partir de la fin (pour les mettre dans l'ordre)
-void printToken(Token * token) {
-    if(token != NULL) {
-        printToken(token->nextToken);
-        printf("{type: \"%s\", value: \"%s\"},\n", getType(token->type) ,token->value);
-    }
-}
-
-// Ajouter un token
-Token * addToken(Token * token, const Type type, const char* value) {
-    Token * newToken = malloc(sizeof(Token));
-    newToken->type = type;
-    newToken->value = malloc(sizeof(char) * (strlen(value) + 1));
-    strcpy(newToken->value, value);
-    newToken->nextToken = token;
-    return newToken;
-}
-
 // Permet de récupérer la string de l'enum pour print
 char * getType(int type) {
     switch(type) {
@@ -109,14 +92,5 @@ char * getType(int type) {
             return "ASSIGN";
         default:
             return "UNKNOWN";
-    }
-}
-
-// Libère les tokens
-void freeToken(Token * token) {
-    if(token != NULL) {
-        free(token->value);
-        freeToken(token->nextToken);
-        free(token);
     }
 }

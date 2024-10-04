@@ -49,17 +49,29 @@ cmake_ninja_workdir = C$:/Users/mathi/OneDrive/Bureau/CLogik/cmake-build-debug/
 
 build cmake_object_order_depends_target_CLogik: phony || .
 
-build CMakeFiles/CLogik.dir/main.c.obj: C_COMPILER__CLogik_unscanned_Debug C$:/Users/mathi/OneDrive/Bureau/CLogik/main.c || cmake_object_order_depends_target_CLogik
-  DEP_FILE = CMakeFiles\CLogik.dir\main.c.obj.d
+build CMakeFiles/CLogik.dir/src/main.c.obj: C_COMPILER__CLogik_unscanned_Debug C$:/Users/mathi/OneDrive/Bureau/CLogik/src/main.c || cmake_object_order_depends_target_CLogik
+  DEP_FILE = CMakeFiles\CLogik.dir\src\main.c.obj.d
   FLAGS = -g -std=gnu11 -fdiagnostics-color=always
   OBJECT_DIR = CMakeFiles\CLogik.dir
-  OBJECT_FILE_DIR = CMakeFiles\CLogik.dir
+  OBJECT_FILE_DIR = CMakeFiles\CLogik.dir\src
 
-build CMakeFiles/CLogik.dir/lexer.c.obj: C_COMPILER__CLogik_unscanned_Debug C$:/Users/mathi/OneDrive/Bureau/CLogik/lexer.c || cmake_object_order_depends_target_CLogik
-  DEP_FILE = CMakeFiles\CLogik.dir\lexer.c.obj.d
+build CMakeFiles/CLogik.dir/src/lexer.c.obj: C_COMPILER__CLogik_unscanned_Debug C$:/Users/mathi/OneDrive/Bureau/CLogik/src/lexer.c || cmake_object_order_depends_target_CLogik
+  DEP_FILE = CMakeFiles\CLogik.dir\src\lexer.c.obj.d
   FLAGS = -g -std=gnu11 -fdiagnostics-color=always
   OBJECT_DIR = CMakeFiles\CLogik.dir
-  OBJECT_FILE_DIR = CMakeFiles\CLogik.dir
+  OBJECT_FILE_DIR = CMakeFiles\CLogik.dir\src
+
+build CMakeFiles/CLogik.dir/src/token.c.obj: C_COMPILER__CLogik_unscanned_Debug C$:/Users/mathi/OneDrive/Bureau/CLogik/src/token.c || cmake_object_order_depends_target_CLogik
+  DEP_FILE = CMakeFiles\CLogik.dir\src\token.c.obj.d
+  FLAGS = -g -std=gnu11 -fdiagnostics-color=always
+  OBJECT_DIR = CMakeFiles\CLogik.dir
+  OBJECT_FILE_DIR = CMakeFiles\CLogik.dir\src
+
+build CMakeFiles/CLogik.dir/src/parser.c.obj: C_COMPILER__CLogik_unscanned_Debug C$:/Users/mathi/OneDrive/Bureau/CLogik/src/parser.c || cmake_object_order_depends_target_CLogik
+  DEP_FILE = CMakeFiles\CLogik.dir\src\parser.c.obj.d
+  FLAGS = -g -std=gnu11 -fdiagnostics-color=always
+  OBJECT_DIR = CMakeFiles\CLogik.dir
+  OBJECT_FILE_DIR = CMakeFiles\CLogik.dir\src
 
 
 # =============================================================================
@@ -69,7 +81,7 @@ build CMakeFiles/CLogik.dir/lexer.c.obj: C_COMPILER__CLogik_unscanned_Debug C$:/
 #############################################
 # Link the executable CLogik.exe
 
-build CLogik.exe: C_EXECUTABLE_LINKER__CLogik_Debug CMakeFiles/CLogik.dir/main.c.obj CMakeFiles/CLogik.dir/lexer.c.obj
+build CLogik.exe: C_EXECUTABLE_LINKER__CLogik_Debug CMakeFiles/CLogik.dir/src/main.c.obj CMakeFiles/CLogik.dir/src/lexer.c.obj CMakeFiles/CLogik.dir/src/token.c.obj CMakeFiles/CLogik.dir/src/parser.c.obj
   FLAGS = -g
   LINK_LIBRARIES = -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   OBJECT_DIR = CMakeFiles\CLogik.dir
