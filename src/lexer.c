@@ -9,7 +9,7 @@
 #include <string.h>
 
 // Permet de comprendre les entrées
-Token * lexer(char*string, Token * token) {
+Token *lexer(char *string, Token *token) {
     while (*string != '\0') {
         char stringValue[2] = {*string, '\0'};
         switch (*string) {
@@ -41,9 +41,9 @@ Token * lexer(char*string, Token * token) {
             case '*':
                 token = addToken(token, OPERATOR, stringValue);
         }
-        if(*string >= '0' && *string <= '9') {
-            char numberString[255]="";
-            while(*string >= '0' && *string <= '9') {
+        if (*string >= '0' && *string <= '9') {
+            char numberString[255] = "";
+            while (*string >= '0' && *string <= '9') {
                 char NumberToString[2] = {*string, '\0'};
                 strcat(numberString, NumberToString);
                 *string++;
@@ -52,9 +52,9 @@ Token * lexer(char*string, Token * token) {
             continue;
         }
 
-        if(*string >= 'a' && *string <= 'z' || *string >= 'A' && *string <= 'Z') {
-            char longString[255]="";
-            while(*string >= 'a' && *string <= 'z' || *string >= 'A' && *string <= 'Z') {
+        if (*string >= 'a' && *string <= 'z' || *string >= 'A' && *string <= 'Z') {
+            char longString[255] = "";
+            while (*string >= 'a' && *string <= 'z' || *string >= 'A' && *string <= 'Z') {
                 char charToString[2] = {*string, '\0'};
                 strcat(longString, charToString);
                 *string++;
@@ -68,8 +68,8 @@ Token * lexer(char*string, Token * token) {
 }
 
 // Permet de récupérer la string de l'enum pour print
-char * getType(int type) {
-    switch(type) {
+char *getType(int type) {
+    switch (type) {
         case NUMBER:
             return "NUMBER";
         case KEYWORD:

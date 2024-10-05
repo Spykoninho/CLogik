@@ -3,7 +3,9 @@
 //
 #ifndef LEXER_H
 #define LEXER_H
-    #include "token.h"
-    Token * lexer(char*, Token*);
-    char * getType(int);
+#include "token.h"
+
+Token *lexer(char *, Token *);
+
+char *getType(int);
 #endif //LEXER_H

@@ -5,31 +5,31 @@
 #ifndef TOKEN_H
 #define TOKEN_H
 
-    typedef enum inputType {
-        NUMBER, // 0 1 2 3...
-        KEYWORD, // if...
-        LPAREN, // (
-        RPAREN, // )
-        IDENTIFIER, // variable
-        OPERATOR, // <, &&...
-        LBRACE, // {
-        RBRACE, // }
-        SEMICOLON, // ;
-        ASSIGN // =
-    }Type;
+typedef enum inputType {
+    NUMBER, // 0 1 2 3...
+    KEYWORD, // if...
+    LPAREN, // (
+    RPAREN, // )
+    IDENTIFIER, // variable
+    OPERATOR, // <, &&...
+    LBRACE, // {
+    RBRACE, // }
+    SEMICOLON, // ;
+    ASSIGN // =
+} Type;
 
-    typedef struct token {
-        Type type;
-        char* value;
-        struct token *nextToken;
-    }Token;
+typedef struct token {
+    Type type;
+    char *value;
+    struct token *nextToken;
+} Token;
 
-    Token * addToken(Token *, const Type, const char *);
+Token *addToken(Token *, const Type, const char *);
 
-    void freeToken(Token *);
+void freeToken(Token *);
 
-    void printToken(Token *);
+void printToken(Token *);
 
-    char * tokensToShuttingYardString(Token * token, char * buffer, unsigned int bufferSize, char * shuttingYardString);
+char *tokensToShuttingYardString(Token *, char ***, int *, char *);
 
 #endif //TOKEN_H
