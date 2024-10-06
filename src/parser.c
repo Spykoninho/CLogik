@@ -27,7 +27,7 @@ void parser(char *input) {
 
         // verif
         printf("shuttingYardString : %s\n", shuttingYardString);
-        printf("BUFFER : \n");
+        printf("BUFFERSIZE : %d \n", bufferSize);
         printBuffer(buffer, bufferSize);
 
         // On free tout
@@ -41,7 +41,7 @@ void parser(char *input) {
 void pushBuffer(char ***buffer, int *bufferSize, char *value) {
     // Vérifie si le buffer n'est pas rempli
     if (*bufferSize >= BUFFER_SIZE) {
-        printf("Buffer is empty\n");
+        printf("(push) Buffer is empty\n");
         return;
     }
 
@@ -63,7 +63,7 @@ void pushBuffer(char ***buffer, int *bufferSize, char *value) {
 void popBuffer(char ***buffer, int *bufferSize) {
     // verifie si le buffer n'est pas vide
     if (*bufferSize <= 0) {
-        printf("Buffer is empty\n");
+        printf("(pop) Buffer is empty\n");
         return;
     }
 
@@ -77,8 +77,8 @@ void popBuffer(char ***buffer, int *bufferSize) {
 void printBuffer(char **buffer, int bufferSize) {
     // verif si vide
     if (bufferSize <= 0) {
-        printf("Buffer is empty\n");
-        return;
+        printf("(print) Buffer is empty\n");
+        return;;
     }
 
     // affiche dans le sens inverse
@@ -91,7 +91,7 @@ void printBuffer(char **buffer, int bufferSize) {
 void freeBuffer(char **buffer, int bufferSize) {
     // verif si buffer vide
     if (buffer == NULL) {
-        printf("Buffer is empty\n");
+        printf("(free) Buffer is empty\n");
         return;
     }
 

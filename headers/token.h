@@ -32,4 +32,8 @@ void printToken(Token *);
 
 char *tokensToShuttingYardString(Token *, char ***, int *, char *);
 
+int isBufferOperatorPriority(char * bufferOperator, char * tokenOperator);
+
+int checkOperatorPriority(const char * operator);
+
 #endif //TOKEN_H

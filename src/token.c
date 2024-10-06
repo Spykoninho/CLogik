@@ -64,15 +64,38 @@ char *tokensToShuttingYardString(Token *token, char ***buffer, int *bufferSize, 
         }
         // si c'est un opérateur on le met dans le buffer
         if (strcmp(getType(token->type), "OPERATOR") == 0) {
-            pushBuffer(buffer, bufferSize, token->value);
+            if(*bufferSize == 0) {
+                pushBuffer(buffer, bufferSize, token->value);
+            }else {
+                while (*bufferSize > 0 && strcmp(getType(token->type), "OPERATOR") == 0) {
+                    if(isBufferOperatorPriority((*buffer)[*bufferSize - 1], token->value)) {
+                        if (*bufferSize == 0) {
+                            strncpy(shuttingYardString, (*buffer)[*bufferSize - 1], 1024 - strlen((*buffer)[*bufferSize - 1]) - 1);
+                            shuttingYardString[1024 - strlen((*buffer)[*bufferSize - 1])] = '\0';
+                        } else {
+                            strncat(shuttingYardString, (*buffer)[*bufferSize - 1], 1024 - strlen((*buffer)[*bufferSize - 1]) - 1);
+                        }
+                        popBuffer(buffer, bufferSize);
+                    }else {
+                        break;
+                    }
+                }
+                pushBuffer(buffer, bufferSize, token->value);
+            }
+        }
+
+        // Si c'est une parenthèse gauche
+        if (strcmp(getType(token->type), "LPAREN") == 0) {
+
         }
         // on passe au token suivant
         tokensToShuttingYardString(token->nextToken, buffer, bufferSize, shuttingYardString);
         return shuttingYardString; // on return la string
     }
     // Une fois qu'on à tout fait sur la liste on rajoute à la fin les opérateurs
-    for (int i = 0; i < *bufferSize; ++i) {
-        strcat(shuttingYardString, (*buffer)[*bufferSize - i - 1]);
+    while (*bufferSize > 0) {
+        strcat(shuttingYardString, (*buffer)[*bufferSize - 1]);
+        popBuffer(buffer, bufferSize);
     }
     return NULL;
 }
@@ -83,5 +106,32 @@ void freeToken(Token *token) {
         free(token->value);
         freeToken(token->nextToken);
         free(token);
+    }
+}
+
+// Définit si l'operateur du buffer doit aller à la sortie
+int isBufferOperatorPriority(char * bufferOperator, char * tokenOperator) {
+    //printf("buffer : %s, operator : %s\n", bufferOperator, tokenOperator);
+    // si c'est égal à l'operateur entrant alors l'operateur dans le buffer vas dans la sortie
+    if(strcmp(bufferOperator, tokenOperator) == 0) return 1;
+    // On check la priorité, si buffer >= newOperator alors ok le l'operator du buffer sort
+    if(checkOperatorPriority(bufferOperator)>=checkOperatorPriority(tokenOperator)) return 1;
+    if(checkOperatorPriority(bufferOperator)<checkOperatorPriority(tokenOperator)) return 0;
+    // au cas où
+    return 0;
+}
+
+int checkOperatorPriority(const char * operator) {
+    switch(operator[0]) { // si on veux faire les += etc faire plutot un strcmp avec plusieurs if
+        case '+':
+        case '-':
+            return 1;
+        case '*':
+        case '/':
+            return 2;
+        case '^':
+            return 3;
+        default:
+            return 0;
     }
 }
