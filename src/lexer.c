@@ -2,13 +2,14 @@
 // Created by mathi on 01/10/2024.
 //
 
-#include "lexer.h"
+#include "../headers/lexer.h"
+#include "../headers/token.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 // Permet de comprendre les entrées
-Token * lexer(char*string, Token * token) {
+Token *lexer(char *string, Token *token) {
     while (*string != '\0') {
         char stringValue[2] = {*string, '\0'};
         switch (*string) {
@@ -38,11 +39,12 @@ Token * lexer(char*string, Token * token) {
             case '-':
             case '/':
             case '*':
+            case '^':
                 token = addToken(token, OPERATOR, stringValue);
         }
-        if(*string >= '0' && *string <= '9') {
-            char numberString[255]="";
-            while(*string >= '0' && *string <= '9') {
+        if (*string >= '0' && *string <= '9') {
+            char numberString[255] = "";
+            while (*string >= '0' && *string <= '9') {
                 char NumberToString[2] = {*string, '\0'};
                 strcat(numberString, NumberToString);
                 *string++;
@@ -51,9 +53,9 @@ Token * lexer(char*string, Token * token) {
             continue;
         }
 
-        if(*string >= 'a' && *string <= 'z' || *string >= 'A' && *string <= 'Z') {
-            char longString[255]="";
-            while(*string >= 'a' && *string <= 'z' || *string >= 'A' && *string <= 'Z') {
+        if (*string >= 'a' && *string <= 'z' || *string >= 'A' && *string <= 'Z') {
+            char longString[255] = "";
+            while (*string >= 'a' && *string <= 'z' || *string >= 'A' && *string <= 'Z') {
                 char charToString[2] = {*string, '\0'};
                 strcat(longString, charToString);
                 *string++;
@@ -66,27 +68,9 @@ Token * lexer(char*string, Token * token) {
     return token;
 }
 
-// Print un token à partir de la fin (pour les mettre dans l'ordre)
-void printToken(Token * token) {
-    if(token != NULL) {
-        printToken(token->nextToken);
-        printf("{type: \"%s\", value: \"%s\"},\n", getType(token->type) ,token->value);
-    }
-}
-
-// Ajouter un token
-Token * addToken(Token * token, const Type type, const char* value) {
-    Token * newToken = malloc(sizeof(Token));
-    newToken->type = type;
-    newToken->value = malloc(sizeof(char) * (strlen(value) + 1));
-    strcpy(newToken->value, value);
-    newToken->nextToken = token;
-    return newToken;
-}
-
 // Permet de récupérer la string de l'enum pour print
-char * getType(int type) {
-    switch(type) {
+char *getType(int type) {
+    switch (type) {
         case NUMBER:
             return "NUMBER";
         case KEYWORD:
@@ -109,14 +93,5 @@ char * getType(int type) {
             return "ASSIGN";
         default:
             return "UNKNOWN";
-    }
-}
-
-// Libère les tokens
-void freeToken(Token * token) {
-    if(token != NULL) {
-        free(token->value);
-        freeToken(token->nextToken);
-        free(token);
     }
 }
