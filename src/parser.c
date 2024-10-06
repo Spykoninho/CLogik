@@ -22,13 +22,12 @@ void parser(char *input) {
         char **buffer = NULL;
         int bufferSize = 0;
         char *shuttingYardString = malloc(sizeof(char) * 1024);
+        strcpy(shuttingYardString, "");
         // on copie le resultat de la fonction qui permet de l'avoir dans notre string
         strcpy(shuttingYardString, tokensToShuttingYardString(token, &buffer, &bufferSize, shuttingYardString));
 
         // verif
         printf("shuttingYardString : %s\n", shuttingYardString);
-        printf("BUFFERSIZE : %d \n", bufferSize);
-        printBuffer(buffer, bufferSize);
 
         // On free tout
         freeBuffer(buffer, bufferSize);

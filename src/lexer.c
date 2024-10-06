@@ -39,6 +39,7 @@ Token *lexer(char *string, Token *token) {
             case '-':
             case '/':
             case '*':
+            case '^':
                 token = addToken(token, OPERATOR, stringValue);
         }
         if (*string >= '0' && *string <= '9') {

@@ -50,49 +50,71 @@ void printToken(Token *token) {
 
 // Converti la liste de token en string shuttingyard
 char *tokensToShuttingYardString(Token *token, char ***buffer, int *bufferSize, char *shuttingYardString) {
-    // Si il y a des tokens
     if (token != NULL) {
         // Si la valeur est un nombre on le met directement dans l'output
         if (strcmp(getType(token->type), "NUMBER") == 0) {
             // Si c'est le premier ajout on fait un copy car strcat se fait que sur une chaine existante
-            if (*bufferSize == 0) {
+            if (strlen(shuttingYardString) == 0) {
                 strncpy(shuttingYardString, token->value, 1024 - strlen(token->value) - 1);
                 shuttingYardString[1024 - strlen(token->value)] = '\0';
             } else {
                 strncat(shuttingYardString, token->value, 1024 - strlen(token->value) - 1);
             }
         }
+
+        if (strcmp(getType(token->type), "LPAREN") == 0) {
+            pushBuffer(buffer, bufferSize, token->value);
+        }
+
+        if (strcmp(getType(token->type), "RPAREN") == 0) {
+            while (strcmp((*buffer)[*bufferSize - 1], "(") != 0) {
+                if (*bufferSize == 0) {
+                    printf("ERREUR, IL MANQUE UNE PARENTHESE");
+                    return NULL;
+                }
+                if (strlen(shuttingYardString) == 0) {
+                    strncpy(shuttingYardString, token->value, 1024 - strlen(token->value) - 1);
+                } else {
+                    strncat(shuttingYardString, (*buffer)[*bufferSize - 1],
+                            1024 - strlen((*buffer)[*bufferSize - 1]) - 1);
+                }
+                popBuffer(buffer, bufferSize);
+            }
+
+            if (*bufferSize > 0 && strcmp((*buffer)[*bufferSize - 1], "(") == 0) {
+                popBuffer(buffer, bufferSize);
+            }
+        }
+
         // si c'est un opérateur on le met dans le buffer
         if (strcmp(getType(token->type), "OPERATOR") == 0) {
-            if(*bufferSize == 0) {
+            if (*bufferSize == 0) {
                 pushBuffer(buffer, bufferSize, token->value);
-            }else {
+            } else {
                 while (*bufferSize > 0 && strcmp(getType(token->type), "OPERATOR") == 0) {
-                    if(isBufferOperatorPriority((*buffer)[*bufferSize - 1], token->value)) {
+                    if (isBufferOperatorPriority((*buffer)[*bufferSize - 1], token->value)) {
                         if (*bufferSize == 0) {
-                            strncpy(shuttingYardString, (*buffer)[*bufferSize - 1], 1024 - strlen((*buffer)[*bufferSize - 1]) - 1);
+                            strncpy(shuttingYardString, (*buffer)[*bufferSize - 1],
+                                    1024 - strlen((*buffer)[*bufferSize - 1]) - 1);
                             shuttingYardString[1024 - strlen((*buffer)[*bufferSize - 1])] = '\0';
                         } else {
-                            strncat(shuttingYardString, (*buffer)[*bufferSize - 1], 1024 - strlen((*buffer)[*bufferSize - 1]) - 1);
+                            strncat(shuttingYardString, (*buffer)[*bufferSize - 1],
+                                    1024 - strlen((*buffer)[*bufferSize - 1]) - 1);
                         }
                         popBuffer(buffer, bufferSize);
-                    }else {
+                    } else {
                         break;
                     }
                 }
                 pushBuffer(buffer, bufferSize, token->value);
             }
         }
-
-        // Si c'est une parenthèse gauche
-        if (strcmp(getType(token->type), "LPAREN") == 0) {
-
-        }
         // on passe au token suivant
         tokensToShuttingYardString(token->nextToken, buffer, bufferSize, shuttingYardString);
         return shuttingYardString; // on return la string
     }
-    // Une fois qu'on à tout fait sur la liste on rajoute à la fin les opérateurs
+
+    // on ajoute à la fin les opérateurs restants
     while (*bufferSize > 0) {
         strcat(shuttingYardString, (*buffer)[*bufferSize - 1]);
         popBuffer(buffer, bufferSize);
@@ -110,19 +132,21 @@ void freeToken(Token *token) {
 }
 
 // Définit si l'operateur du buffer doit aller à la sortie
-int isBufferOperatorPriority(char * bufferOperator, char * tokenOperator) {
-    //printf("buffer : %s, operator : %s\n", bufferOperator, tokenOperator);
-    // si c'est égal à l'operateur entrant alors l'operateur dans le buffer vas dans la sortie
-    if(strcmp(bufferOperator, tokenOperator) == 0) return 1;
+int isBufferOperatorPriority(char *bufferOperator, char *tokenOperator) {
+    // si c'est égal à l'operateur entrant alors true
+    if (strcmp(bufferOperator, tokenOperator) == 0) return 1;
+
     // On check la priorité, si buffer >= newOperator alors ok le l'operator du buffer sort
-    if(checkOperatorPriority(bufferOperator)>=checkOperatorPriority(tokenOperator)) return 1;
-    if(checkOperatorPriority(bufferOperator)<checkOperatorPriority(tokenOperator)) return 0;
-    // au cas où
+    if (checkOperatorPriority(bufferOperator) >= checkOperatorPriority(tokenOperator)) return 1;
+    if (checkOperatorPriority(bufferOperator) < checkOperatorPriority(tokenOperator)) return 0;
+
+    // Au cas où
     return 0;
 }
 
-int checkOperatorPriority(const char * operator) {
-    switch(operator[0]) { // si on veux faire les += etc faire plutot un strcmp avec plusieurs if
+int checkOperatorPriority(const char *operator) {
+    switch (operator[0]) {
+        // si on veux faire les += etc faire plutot un strcmp avec plusieurs if
         case '+':
         case '-':
             return 1;
