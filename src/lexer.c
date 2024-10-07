@@ -41,6 +41,13 @@ Token *lexer(char *string, Token *token) {
             case '*':
             case '^':
                 token = addToken(token, OPERATOR, stringValue);
+                break;
+            case '"':
+                token = addToken(token, QUOTES, stringValue);
+                break;
+            case '.':
+                token = addToken(token, DOT, stringValue);
+                break;
         }
         if (*string >= '0' && *string <= '9') {
             char numberString[255] = "";
@@ -91,6 +98,10 @@ char *getType(int type) {
             return "SEMICOLON";
         case ASSIGN:
             return "ASSIGN";
+        case QUOTES:
+            return "QUOTES";
+        case DOT:
+            return "DOT";
         default:
             return "UNKNOWN";
     }

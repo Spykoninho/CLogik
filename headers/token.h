@@ -15,7 +15,9 @@ typedef enum inputType {
     LBRACE, // {
     RBRACE, // }
     SEMICOLON, // ;
-    ASSIGN // =
+    ASSIGN, // =
+    QUOTES, // ""
+    DOT // .
 } Type;
 
 typedef struct token {

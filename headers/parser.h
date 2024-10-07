@@ -14,4 +14,7 @@ void popBuffer(char ***buffer, int *bufferSize);
 void freeBuffer(char **buffer, int bufferSize);
 
 void printBuffer(char **buffer, int bufferSize);
+
+int calculShuttingYard(char *input);
+
 #endif //PARSER_H

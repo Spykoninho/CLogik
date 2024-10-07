@@ -25,9 +25,11 @@ void parser(char *input) {
         strcpy(shuttingYardString, "");
         // on copie le resultat de la fonction qui permet de l'avoir dans notre string
         strcpy(shuttingYardString, tokensToShuttingYardString(token, &buffer, &bufferSize, shuttingYardString));
-
-        // verif
         printf("shuttingYardString : %s\n", shuttingYardString);
+
+        if(strlen(shuttingYardString)>0) {
+            // Calculer
+        }
 
         // On free tout
         freeBuffer(buffer, bufferSize);
@@ -101,4 +103,8 @@ void freeBuffer(char **buffer, int bufferSize) {
 
     // puis libere le buffer en lui même
     free(buffer);
+}
+
+int calculShuttingYard(char *input) {
+
 }
