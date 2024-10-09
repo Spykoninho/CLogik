@@ -16,22 +16,17 @@ void parser(char *input) {
     // crée la suite de token en fonction de l'input
     Token *token = NULL;
     token = lexer(input, token);
-
+    printToken(token);
     // Si il y a bien des instructions
     if (token != NULL) {
         char **buffer = NULL;
         int bufferSize = 0;
-        char *shuttingYardString = malloc(sizeof(char) * 1024);
-        strcpy(shuttingYardString, "");
+        StToken *shuttingYardTokens = NULL;
         // on copie le resultat de la fonction qui permet de l'avoir dans notre string
-        strcpy(shuttingYardString, tokensToShuttingYardString(token, &buffer, &bufferSize, shuttingYardString));
-
-        // verif
-        printf("shuttingYardString : %s\n", shuttingYardString);
+        tokensToShuttingYardString(token, &buffer, &bufferSize, shuttingYardTokens);
 
         // On free tout
         freeBuffer(buffer, bufferSize);
-        free(shuttingYardString);
         freeToken(token);
     }
 }
@@ -101,4 +96,17 @@ void freeBuffer(char **buffer, int bufferSize) {
 
     // puis libere le buffer en lui même
     free(buffer);
+}
+
+StToken * addStToken(StToken* head, Type type, char * value) {
+    StToken * newStToken = malloc(sizeof(StToken));
+    if(newStToken == NULL) {
+        printf("Erreur d'allocation mémoire StToken");
+        return NULL;
+    }
+    newStToken->type = type;
+    newStToken->value = malloc(sizeof(char)*strlen(value) + 1);
+    strcpy(newStToken->value, value);
+    newStToken->nextStToken = head;
+    return newStToken;
 }

@@ -49,20 +49,14 @@ void printToken(Token *token) {
 }
 
 // Converti la liste de token en string shuttingyard
-char *tokensToShuttingYardString(Token *token, char ***buffer, int *bufferSize, char *shuttingYardString) {
+char *tokensToShuttingYardString(Token *token, char ***buffer, int *bufferSize, StToken * stToken) {
     if (token != NULL) {
         // Si la valeur est un nombre on le met directement dans l'output
-        if (strcmp(getType(token->type), "NUMBER") == 0) {
-            // Si c'est le premier ajout on fait un copy car strcat se fait que sur une chaine existante
-            if (strlen(shuttingYardString) == 0) {
-                strncpy(shuttingYardString, token->value, 1024 - strlen(token->value) - 1);
-                shuttingYardString[1024 - strlen(token->value)] = '\0';
-            } else {
-                strncat(shuttingYardString, token->value, 1024 - strlen(token->value) - 1);
-            }
+        if (strcmp(getType(token->type), "NUMBER") == 0) { // on l'ajoute à la liste
+            addStToken(stToken, NUMBER, token->value);
         }
 
-        if (strcmp(getType(token->type), "LPAREN") == 0) {
+        if (strcmp(getType(token->type), "LPAREN") == 0) { // on le met dans le buffer
             pushBuffer(buffer, bufferSize, token->value);
         }
 
@@ -72,12 +66,7 @@ char *tokensToShuttingYardString(Token *token, char ***buffer, int *bufferSize, 
                     printf("ERREUR, IL MANQUE UNE PARENTHESE");
                     return NULL;
                 }
-                if (strlen(shuttingYardString) == 0) {
-                    strncpy(shuttingYardString, token->value, 1024 - strlen(token->value) - 1);
-                } else {
-                    strncat(shuttingYardString, (*buffer)[*bufferSize - 1],
-                            1024 - strlen((*buffer)[*bufferSize - 1]) - 1);
-                }
+                // Retrouver la valeur et le type du buffer, voir pour faire un buffer en ligne chainée
                 popBuffer(buffer, bufferSize);
             }
 
@@ -93,14 +82,7 @@ char *tokensToShuttingYardString(Token *token, char ***buffer, int *bufferSize, 
             } else {
                 while (*bufferSize > 0 && strcmp(getType(token->type), "OPERATOR") == 0) {
                     if (isBufferOperatorPriority((*buffer)[*bufferSize - 1], token->value)) {
-                        if (*bufferSize == 0) {
-                            strncpy(shuttingYardString, (*buffer)[*bufferSize - 1],
-                                    1024 - strlen((*buffer)[*bufferSize - 1]) - 1);
-                            shuttingYardString[1024 - strlen((*buffer)[*bufferSize - 1])] = '\0';
-                        } else {
-                            strncat(shuttingYardString, (*buffer)[*bufferSize - 1],
-                                    1024 - strlen((*buffer)[*bufferSize - 1]) - 1);
-                        }
+                        // add buffer
                         popBuffer(buffer, bufferSize);
                     } else {
                         break;
@@ -110,13 +92,13 @@ char *tokensToShuttingYardString(Token *token, char ***buffer, int *bufferSize, 
             }
         }
         // on passe au token suivant
-        tokensToShuttingYardString(token->nextToken, buffer, bufferSize, shuttingYardString);
-        return shuttingYardString; // on return la string
+        tokensToShuttingYardString(token->nextToken, buffer, bufferSize, stToken);
+        return stToken;
     }
 
     // on ajoute à la fin les opérateurs restants
     while (*bufferSize > 0) {
-        strcat(shuttingYardString, (*buffer)[*bufferSize - 1]);
+        addStToken(stToken, NUMBER, (*buffer)[*bufferSize - 1]); // a revoir le buffer
         popBuffer(buffer, bufferSize);
     }
     return NULL;
@@ -144,16 +126,16 @@ int isBufferOperatorPriority(char *bufferOperator, char *tokenOperator) {
     return 0;
 }
 
-int checkOperatorPriority(const char *operator) {
-    switch (operator[0]) {
+int checkOperatorPriority(Type type) {
+    switch (type) {
         // si on veux faire les += etc faire plutot un strcmp avec plusieurs if
-        case '+':
-        case '-':
+        case PLUS:
+        case MINUS:
             return 1;
-        case '*':
-        case '/':
+        case MULT:
+        case DIV:
             return 2;
-        case '^':
+        case POW:
             return 3;
         default:
             return 0;
