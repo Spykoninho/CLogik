@@ -72,8 +72,14 @@ Token *lexer(char *string, Token *token) {
                 strcat(longString, charToString);
                 *string++;
             }
-            token = addToken(token, IDENTIFIER, longString);
-            continue;
+            
+            if (strcmp(longString, "print") == 0) {
+                token = addToken(token, PRINT, longString);
+                continue;
+            } else {                
+                token = addToken(token, IDENTIFIER, longString);
+                continue;
+            }
         }
         string++;
     }
@@ -129,6 +135,8 @@ char *getType(int type) {
             return "QUOTES";
         case DOT:
             return "DOT";
+        case PRINT:
+            return "PRINT";
         default:
             return "UNKNOWN";
     }
