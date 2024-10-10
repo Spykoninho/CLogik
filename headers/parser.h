@@ -34,6 +34,7 @@ typedef struct ShuttingYardToken {
     char * value;
     Type type;
     struct ShuttingYardToken * nextStToken;
+    struct ShuttingYardToken * previousStToken;
 }StToken;
 
 typedef struct StBuffer {
@@ -55,8 +56,11 @@ void printBuffer(char **buffer, int bufferSize);
 StToken * addStToken(StToken* head, Type type, char * value);
 
 // print pour debug
+void printStToken(StToken * stToken);
 // Free buffer et sttoken
-// get
+void freeStToken(StToken * stToken);
+// get ??? (jsp à quoi ça sert)
 // addbuffer
+void addBuffer(StBuffer ** buffer, Type type, char * value);
 
 #endif //PARSER_H

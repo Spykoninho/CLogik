@@ -28,13 +28,12 @@ Token *lexer(char *string, Token *token) {
             case ';':
                 token = addToken(token, SEMICOLON, stringValue);
                 break;
-            case '=':
-                token = addToken(token, ASSIGN, stringValue);
-                break;
             case '+':
                 token = addToken(token, PLUS, stringValue);
+                break;
             case '-':
                 token = addToken(token, MINUS, stringValue);
+                break;
             case '/':
                 token = addToken(token, DIV, stringValue);
                 break;
@@ -43,8 +42,9 @@ Token *lexer(char *string, Token *token) {
                 break;
             case '^':
                 token = addToken(token, POW, stringValue);
+                break;
         }
-        // rajouter les < > & |
+        // rajouter les < > & | = ! % >= <= == !=
         if (*string >= '0' && *string <= '9') {
             char numberString[255] = "";
             while (*string >= '0' && *string <= '9') {

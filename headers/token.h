@@ -18,10 +18,12 @@ void freeToken(Token *);
 
 void printToken(Token *);
 
-char *tokensToShuttingYardString(Token *, char ***, int *, StToken *);
+void tokensToShuttingYardLinkedList(const Token *, char ***, int *, StToken **);
 
-int isBufferOperatorPriority(char * bufferOperator, char * tokenOperator);
+int isBufferOperatorPriority(Type bufferType, Type operatorType);
 
-int checkOperatorPriority(const char * operator);
+int checkOperatorPriority(Type type);
+
+int isOperator(Type type);
 
 #endif //TOKEN_H
