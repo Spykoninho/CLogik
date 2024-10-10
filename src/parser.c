@@ -24,7 +24,7 @@ void parser(char *input) {
         char *shuttingYardString = malloc(sizeof(char) * 1024);
         strcpy(shuttingYardString, "");
         // on copie le resultat de la fonction qui permet de l'avoir dans notre string
-        strcpy(shuttingYardString, tokensToShuttingYardString(token, &buffer, &bufferSize, shuttingYardString));
+        strcpy(shuttingYardString, tokensToShuttingYardString(token, &buffer, &bufferSize, shuttingYardString)); // REMPLACER LE RETURN PAR SHUTTINGYARDTOKENS
         printf("shuttingYardString : %s\n", shuttingYardString);
 
         if(strlen(shuttingYardString)>0) {
@@ -105,6 +105,6 @@ void freeBuffer(char **buffer, int bufferSize) {
     free(buffer);
 }
 
-int calculShuttingYard(char *input) {
+/*int calculShuttingYard(char *input) {
 
-}
+}*/

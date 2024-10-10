@@ -9,7 +9,7 @@ typedef enum {
     STRING,
     INT,
     DOUBLE,
-    CHAR,
+    CALCUL
 }VarType;
 
 typedef struct Variable{
@@ -19,12 +19,14 @@ typedef struct Variable{
     struct Variable * nextVar;
 }Var;
 
-Var * addVariable(char * input);
+Var * addVariable(char * input, Var *headVar);
 
 void freeVariable(Var * variable);
 
-Var * getVariable(Var *var);
+Var * getVariable(Var *var, char *searchedVar);
 
-void printVariable(Var *var);
+void printVariables(Var *var);
+
+char * getVarType(int type);
 
 #endif //VARIABLE_H
