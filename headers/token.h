@@ -17,6 +17,7 @@ Token *addToken(Token *, const Type, const char *);
 void freeToken(Token *);
 
 void printToken(Token *);
+void  printoneStToken(StToken* actualStToken);
 
 void tokensToShuttingYardLinkedList(const Token *, char ***, int *, StToken **);
 
@@ -25,5 +26,6 @@ int isBufferOperatorPriority(Type bufferType, Type operatorType);
 int checkOperatorPriority(Type type);
 
 int isOperator(Type type);
+void calcul(StToken *stToken);
 
 #endif //TOKEN_H
