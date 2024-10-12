@@ -108,7 +108,7 @@ void tokensToShuttingYardLinkedList(const Token *token, char ***buffer, int *buf
 }
 
 void calcul(StToken *stToken) {
-    StToken *stTokenPile= NULL;
+    StToken *stTokenPile = NULL;
     StToken *actualStToken = stToken;
     while (actualStToken != NULL) {
         if (isOperator(actualStToken->type)) // si on a un opérateur, on fait le calcul
@@ -169,7 +169,7 @@ void calcul(StToken *stToken) {
             free(oldStTokenPile);
         } else {
             // si c'est pas un opérateur, on met l'élément dans la stTokenPile, du coup on a toujours les deux derniers éléments de la stTokenPile qui seront les opérandes
-            if (stTokenPile== NULL) {
+            if (stTokenPile == NULL) {
                 stTokenPile = actualStToken;
             } else {
                 stTokenPile->nextStToken = actualStToken;
@@ -186,18 +186,15 @@ void calcul(StToken *stToken) {
     printf("--------------------------------------------------------------\n");
 }
 
-
-/*
-
 // Libère les tokens
 void freeToken(Token *token) {
-if (token != NULL) {
-free(token->value);
-freeToken(token->nextToken);
-free(token);
+    if (token != NULL) {
+        free(token->value);
+        freeToken(token->nextToken);
+        free(token);
+    }
 }
-}
-*/
+
 // Définit si l'operateur du buffer doit aller à la sortie
 int isBufferOperatorPriority(Type bufferOperator, Type tokenOperator) {
     // si c'est égal à l'operateur entrant alors true
@@ -246,7 +243,8 @@ int isOperator(Type type) {
             return 0;
     }
 }
-void printoneStToken(StToken* actualStToken) {
+
+void printoneStToken(StToken *actualStToken) {
     printf("Printing one stToken\n");
     printf("{type: \"%s\", value: \"%s\"},\n", getType(actualStToken->type), actualStToken->value);
 }

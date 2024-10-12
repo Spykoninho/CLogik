@@ -27,6 +27,8 @@ typedef enum inputType {
     RBRACE, // }
     SEMICOLON, // ;
     ASSIGN, // =
+    QUOTES, // "
+    DOT, // .
     UNKNOWN = -1      // quand le lexer sait pas ou que c'est pas encore implémenté
 } Type;
 

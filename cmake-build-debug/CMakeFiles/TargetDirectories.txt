@@ -1,3 +1,0 @@
-C:/Users/mathf/Desktop/Cours/S1/C/CLogik/cmake-build-debug/CMakeFiles/CLogik.dir
-C:/Users/mathf/Desktop/Cours/S1/C/CLogik/cmake-build-debug/CMakeFiles/edit_cache.dir
-C:/Users/mathf/Desktop/Cours/S1/C/CLogik/cmake-build-debug/CMakeFiles/rebuild_cache.dir

@@ -6,21 +6,6 @@
 #define TOKEN_H
 #include "parser.h"
 
-typedef enum inputType {
-    NUMBER, // 0 1 2 3...
-    KEYWORD, // if...
-    LPAREN, // (
-    RPAREN, // )
-    IDENTIFIER, // variable
-    OPERATOR, // <, &&...
-    LBRACE, // {
-    RBRACE, // }
-    SEMICOLON, // ;
-    ASSIGN, // =
-    QUOTES, // ""
-    DOT // .
-} Type;
-
 typedef struct token {
     Type type;
     char *value;
@@ -32,7 +17,7 @@ Token *addToken(Token *, const Type, const char *);
 void freeToken(Token *);
 
 void printToken(Token *);
-void  printoneStToken(StToken* actualStToken);
+void printoneStToken(StToken* actualStToken);
 
 void tokensToShuttingYardLinkedList(const Token *, char ***, int *, StToken **);
 
