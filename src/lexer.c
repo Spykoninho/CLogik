@@ -28,19 +28,20 @@ Token *lexer(char *string, Token *token) {
             case ';':
                 token = addToken(token, SEMICOLON, stringValue);
                 break;
-            case '=':
-                token = addToken(token, ASSIGN, stringValue);
-                break;
-            case '<':
-            case '>':
-            case '&':
-            case '|':
             case '+':
+                token = addToken(token, PLUS, stringValue);
+                break;
             case '-':
+                token = addToken(token, MINUS, stringValue);
+                break;
             case '/':
+                token = addToken(token, DIV, stringValue);
+                break;
             case '*':
+                token = addToken(token, MULT, stringValue);
+                break;
             case '^':
-                token = addToken(token, OPERATOR, stringValue);
+                token = addToken(token, POW, stringValue);
                 break;
             case '"':
                 token = addToken(token, QUOTES, stringValue);
@@ -49,6 +50,7 @@ Token *lexer(char *string, Token *token) {
                 token = addToken(token, DOT, stringValue);
                 break;
         }
+        // rajouter les < > & | = ! % >= <= == !=
         if (*string >= '0' && *string <= '9') {
             char numberString[255] = "";
             while (*string >= '0' && *string <= '9') {
@@ -88,8 +90,30 @@ char *getType(int type) {
             return "RPAREN";
         case IDENTIFIER:
             return "IDENTIFIER";
-        case OPERATOR:
-            return "OPERATOR";
+        case PLUS:
+            return "PLUS";
+        case MINUS:
+            return "MINUS";
+        case NOT:
+            return "NOT";
+        case MULT:
+            return "MULT";
+        case DIV:
+            return "DIV";
+        case MOD:
+            return "MOD";
+        case POW:
+            return "POW";
+        case GREATER:
+            return "GREATER";
+        case LESS:
+            return "LESS";
+        case GREATEREQ:
+            return "GREATEREQ";
+        case LESSEQ:
+            return "LESSEQ";
+        case EQUAL:
+            return "EQUAL";
         case LBRACE:
             return "LBRACE";
         case RBRACE:

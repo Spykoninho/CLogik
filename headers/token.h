@@ -4,6 +4,7 @@
 
 #ifndef TOKEN_H
 #define TOKEN_H
+#include "parser.h"
 
 typedef enum inputType {
     NUMBER, // 0 1 2 3...
@@ -31,11 +32,15 @@ Token *addToken(Token *, const Type, const char *);
 void freeToken(Token *);
 
 void printToken(Token *);
+void  printoneStToken(StToken* actualStToken);
 
-char *tokensToShuttingYardString(Token *, char ***, int *, char *);
+void tokensToShuttingYardLinkedList(const Token *, char ***, int *, StToken **);
 
-int isBufferOperatorPriority(char * bufferOperator, char * tokenOperator);
+int isBufferOperatorPriority(Type bufferType, Type operatorType);
 
-int checkOperatorPriority(const char * operator);
+int checkOperatorPriority(Type type);
+
+int isOperator(Type type);
+void calcul(StToken *stToken);
 
 #endif //TOKEN_H
