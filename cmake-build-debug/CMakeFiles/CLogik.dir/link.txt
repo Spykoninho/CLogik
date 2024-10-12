@@ -1,0 +1,3 @@
+"C:\Program Files\JetBrains\CLion 2024.2.2\bin\cmake\win\x64\bin\cmake.exe" -E rm -f CMakeFiles\CLogik.dir/objects.a
+C:\PROGRA~1\JETBRA~1\CLION2~1.2\bin\mingw\bin\ar.exe qc CMakeFiles\CLogik.dir/objects.a @CMakeFiles\CLogik.dir\objects1.rsp
+C:\PROGRA~1\JETBRA~1\CLION2~1.2\bin\mingw\bin\gcc.exe -g -Wl,--whole-archive CMakeFiles\CLogik.dir/objects.a -Wl,--no-whole-archive -o CLogik.exe -Wl,--out-implib,libCLogik.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\CLogik.dir\linkLibs.rsp

@@ -224,6 +224,30 @@ src/token.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\CLogik.dir\build.make CMakeFiles/CLogik.dir/src/token.c.s
 .PHONY : src/token.c.s
 
+src/variable.obj: src/variable.c.obj
+.PHONY : src/variable.obj
+
+# target to build an object file
+src/variable.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\CLogik.dir\build.make CMakeFiles/CLogik.dir/src/variable.c.obj
+.PHONY : src/variable.c.obj
+
+src/variable.i: src/variable.c.i
+.PHONY : src/variable.i
+
+# target to preprocess a source file
+src/variable.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\CLogik.dir\build.make CMakeFiles/CLogik.dir/src/variable.c.i
+.PHONY : src/variable.c.i
+
+src/variable.s: src/variable.c.s
+.PHONY : src/variable.s
+
+# target to generate assembly for a file
+src/variable.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\CLogik.dir\build.make CMakeFiles/CLogik.dir/src/variable.c.s
+.PHONY : src/variable.c.s
+
 # Help Target
 help:
 	@echo The following are some of the valid targets for this Makefile:
@@ -245,6 +269,9 @@ help:
 	@echo ... src/token.obj
 	@echo ... src/token.i
 	@echo ... src/token.s
+	@echo ... src/variable.obj
+	@echo ... src/variable.i
+	@echo ... src/variable.s
 .PHONY : help
 
 

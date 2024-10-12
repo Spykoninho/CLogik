@@ -9,7 +9,6 @@ typedef enum {
     STRING,
     INT,
     DOUBLE,
-    CALCUL
 }VarType;
 
 typedef struct Variable{
@@ -29,4 +28,5 @@ void printVariables(Var *var);
 
 char * getVarType(int type);
 
+int getListLength(Token *token);
 #endif //VARIABLE_H

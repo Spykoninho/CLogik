@@ -94,30 +94,31 @@ Var *addVariable(char *input, Var *headVar) {
             continue;
         }
 
-        if (strcmp(getType(token->type), "NUMBER") == 0) {
-            newVar->value = malloc(sizeof(char) * strlen(token->value)+1);
+        // Pour les nombres / calculs
+        if (strcmp(getType(token->type), "NUMBER") == 0 && getListLength(token)==1) {
             if (newVar->value == NULL) {
                 printf("Erreur pour l'allocation en mémoire de la valeur de la variable\n");
                 freeVariable(newVar);
                 return headVar;
             }
-            strcpy(newVar->value, token->value);
             Token * temp = token->nextToken;
             if (temp != NULL && strcmp(getType(temp->type), "DOT") == 0) {
                 // Il y a un point, donc on traite ça comme un double
                 verifDot++;
-                strcat(newVar->value, ".");
                 temp = temp->nextToken;
                 newVar->type = DOUBLE;
 
                 // Si un nombre suit le point, on le concatène, sinon on ajoute "0"
                 if (temp != NULL && strcmp(getType(temp->type), "NUMBER") == 0) {
+                    newVar->value = malloc(sizeof(char) * strlen(token->value)+2+strlen(temp->value)+1); // pour le . le \0 et le chiffre après la virgule
+                    strcpy(newVar->value, token->value);
+                    strcat(newVar->value, ".");
                     strcat(newVar->value, temp->value);
                     token = temp->nextToken;
                 } else {
                     // Cas où il n'y a pas de chiffre après le point (e.g. 12.)
                     strcat(newVar->value, "0");
-                    token = token->nextToken; // Avancer après le point
+                    break;
                 }
             } else {
                 newVar->type = INT;
@@ -127,9 +128,15 @@ Var *addVariable(char *input, Var *headVar) {
             continue;
         }
 
-
-        // Espace réservé au reste
-        if (strcmp(getType(token->type), "IDENTIFIER") == 0) {
+        // Pour les calculs ex : a+2 ou 2+b ou a*b
+        if (count>2 && getListLength(token)>1) {
+            printf("CALCUL : ");
+            while (token!=NULL) {
+                printf("%s", token->value);
+                token = token->nextToken;
+            }
+            printf("\n");
+            break;
             // Voir pour mettre un type calcul ou quoi pour indiquer qu'il y a une var dedans pour ensuite faire une fonction qui calcul avec la variable
         }
 
@@ -186,6 +193,26 @@ void freeVariable(Var *variable) {
     }
 }
 
+int getListLength(Token *token) {
+    if(token == NULL) return 0;
+    int count = 0;
+    while (token!=NULL) {
+        count++;
+        token = token->nextToken;
+    }
+    return count;
+}
+
+int isCalcul(Token *token) {
+    if(token == NULL) return 0;
+    int count = 0;
+    while (token!=NULL) {
+        count++;
+        token = token->nextToken;
+    }
+    return count;
+}
+
 char *getVarType(int type) {
     switch (type) {
         case STRING:
@@ -194,8 +221,6 @@ char *getVarType(int type) {
             return "INT";
         case DOUBLE:
             return "DOUBLE";
-        case CALCUL:
-            return "CALCUL";
         default:
             return "UNKNOWN";
     }
