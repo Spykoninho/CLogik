@@ -14,7 +14,6 @@ Var *addVariable(char *input, Var *headVar) {
     Token *token = NULL;
     // Conversion de l'input en tokens
     token = lexer(input, token);
-    printToken(token);
     if (token == NULL) {
         printf("Erreur dans a récupération des tokens\n");
         return NULL;
@@ -27,138 +26,138 @@ Var *addVariable(char *input, Var *headVar) {
         return NULL;
     }
 
-    int count = 0;
-    int verifDot = 0;
-
-    while (token != NULL) {
-        // NOM DE LA VARIABLE
-        if (strcmp(getType(token->type), "IDENTIFIER") == 0 && count == 0) {
-            newVar->name = malloc(sizeof(char) * strlen(token->value)+1);
-            if (newVar->name == NULL) {
-                printf("Erreur pour l'allocation en mémoire du nom de la variable\n");
-                freeVariable(newVar);
-                return headVar;
-            }
-            strcpy(newVar->name, token->value);
-            token = token->nextToken;
-            count++;
-            continue;
-        }
-
-        // VERIF DU =
-        if (strcmp(getType(token->type), "ASSIGN") == 0 && count != 1) {
-            printf("Erreur de format pour initialiser la variable\n");
-            free(newVar->name);
+    // Assignation du nom de la variable
+    if (strcmp(getType(token->type), "IDENTIFIER") == 0) {
+        newVar->name = malloc(sizeof(char) * strlen(token->value) + 1);
+        if (newVar->name == NULL) {
+            printf("Erreur pour l'allocation en mémoire du nom de la variable\n");
+            freeVariable(newVar);
             return headVar;
         }
-
-        // POUR STRING
-        if (strcmp(getType(token->type), "QUOTES") == 0) {
-            newVar->type=STRING;
-            token = token->nextToken;
-
-            char * longString = malloc(sizeof(char)*255);
-            if (longString == NULL) {
-                printf("Erreur pour l'allocation en mémoire du nom de la variable\n");
-                freeVariable(newVar);
-                return headVar;
-            }
-            longString[0] = '\0';
-            int countForSpace = 0;
-            while (token != NULL && strcmp(getType(token->type), "QUOTES") != 0) {
-                strncat(longString, token->value, 255 - strlen(longString));
-                token = token->nextToken;
-                if(countForSpace % 2 == 0) {
-                    strcat(longString, " ");
-                    continue;
-                }
-                countForSpace++;
-            }
-            if (token == NULL || strcmp(getType(token->type), "QUOTES") != 0) {
-                printf("Erreur de format pour initialiser la variable\n");
-                freeVariable(newVar);
-                free(longString);
-                return headVar;
-            }
-            newVar->value = malloc(sizeof(char) * strlen(longString)+1);
-            if (newVar->value == NULL) {
-                printf("Erreur pour l'allocation en mémoire de la valeur de la variable\n");
-                free(longString);
-                freeVariable(newVar);
-                return headVar;
-            }
-            strcpy(newVar->value, longString);
-            free(longString);
-            token = token->nextToken;
-            count++;
-            continue;
-        }
-
-        // Pour les nombres / calculs
-        if (strcmp(getType(token->type), "NUMBER") == 0 && getListLength(token)==1) {
-            if (newVar->value == NULL) {
-                printf("Erreur pour l'allocation en mémoire de la valeur de la variable\n");
-                freeVariable(newVar);
-                return headVar;
-            }
-            Token * temp = token->nextToken;
-            if (temp != NULL && strcmp(getType(temp->type), "DOT") == 0) {
-                // Il y a un point, donc on traite ça comme un double
-                verifDot++;
-                temp = temp->nextToken;
-                newVar->type = DOUBLE;
-
-                // Si un nombre suit le point, on le concatène, sinon on ajoute "0"
-                if (temp != NULL && strcmp(getType(temp->type), "NUMBER") == 0) {
-                    newVar->value = malloc(sizeof(char) * strlen(token->value)+2+strlen(temp->value)+1); // pour le . le \0 et le chiffre après la virgule
-                    strcpy(newVar->value, token->value);
-                    strcat(newVar->value, ".");
-                    strcat(newVar->value, temp->value);
-                    token = temp->nextToken;
-                } else {
-                    // Cas où il n'y a pas de chiffre après le point (e.g. 12.)
-                    strcat(newVar->value, "0");
-                    break;
-                }
-            } else {
-                newVar->type = INT;
-            }
-            token = token->nextToken;
-            count++;
-            continue;
-        }
-
-        // Pour les calculs ex : a+2 ou 2+b ou a*b
-        if (count>2 && getListLength(token)>1) {
-            printf("CALCUL : ");
-            while (token!=NULL) {
-                printf("%s", token->value);
-                token = token->nextToken;
-            }
-            printf("\n");
-            break;
-            // Voir pour mettre un type calcul ou quoi pour indiquer qu'il y a une var dedans pour ensuite faire une fonction qui calcul avec la variable
-        }
-
-        count++;
+        strcpy(newVar->name, token->value);
         token = token->nextToken;
-    }
-
-    if (verifDot > 1) {
+    } else {
         printf("Erreur de format pour initialiser la variable 1\n");
         freeVariable(newVar);
         return headVar;
     }
 
+    // verification du =
+    if (strcmp(getType(token->type), "ASSIGN") != 0) {
+        printf("Erreur de format pour initialiser la variable 2\n");
+        free(newVar->name);
+        return headVar;
+    }
+    token = token->nextToken; // on saute l'espace
+
+    // on verif s'il y a un calcul dans l'operation
+    int isCalcul = 0;
+    int isDot = 0;
+    Token *temp = token;
+    while (temp != NULL) {
+        if (isOperator(temp->type)) {
+            isCalcul = 1;
+        }
+        if (strcmp(getType(temp->type), "DOT") == 0) {
+            isDot = 1;
+        }
+        temp = temp->nextToken;
+    }
+
+    // POUR STRING
+    if (token != NULL && strcmp(getType(token->type), "QUOTES") == 0) {
+        newVar->type = STRING;
+        token = token->nextToken;
+
+        char *longString = malloc(sizeof(char) * 255);
+        if (longString == NULL) {
+            printf("Erreur pour l'allocation en mémoire du nom de la variable\n");
+            freeVariable(newVar);
+            return headVar;
+        }
+        longString[0] = '\0';
+        int countForSpace = 0;
+        while (token != NULL && strcmp(getType(token->type), "QUOTES") != 0) {
+            strncat(longString, token->value, 255 - strlen(longString));
+            token = token->nextToken;
+            if (countForSpace % 2 == 0) {
+                strcat(longString, " ");
+                continue;
+            }
+            countForSpace++;
+        }
+        if (token == NULL || strcmp(getType(token->type), "QUOTES") != 0) {
+            printf("Erreur de format pour initialiser la variable 3\n");
+            freeVariable(newVar);
+            free(longString);
+            return headVar;
+        }
+        newVar->value = malloc(sizeof(char) * strlen(longString) + 1);
+        if (newVar->value == NULL) {
+            printf("Erreur pour l'allocation en mémoire de la valeur de la variable\n");
+            free(longString);
+            freeVariable(newVar);
+            return headVar;
+        }
+        strcpy(newVar->value, longString);
+        free(longString);
+
+    } else if (isCalcul) { // Si c'est un calcul
+        if (isDot) {
+            newVar->type = DOUBLE;
+            double result = 0;
+            while (token != NULL) {
+                token = token->nextToken;
+            }
+        }else {
+
+            newVar->type = INT;
+            int result = 0;
+        }
+    }else if (token != NULL && strcmp(getType(token->type), "NUMBER") == 0) { // Pour les nombres
+        Token *tempToken = token->nextToken;
+        if (tempToken != NULL && strcmp(getType(tempToken->type), "DOT") == 0) {
+            // Il y a un point, donc on traite ça comme un double
+            tempToken = tempToken->nextToken;
+            newVar->type = DOUBLE;
+
+            // Si un nombre suit le point, on le concatène, sinon on ajoute "0"
+            if (tempToken != NULL && strcmp(getType(tempToken->type), "NUMBER") == 0) {
+                newVar->value = malloc(sizeof(char) * strlen(token->value) + 2 + strlen(tempToken->value) + 1); // pour le . le \0 et le chiffre après la virgule
+                if (newVar->value == NULL) {
+                    printf("Erreur pour l'allocation en mémoire de la valeur de la variable\n");
+                    freeVariable(newVar);
+                    return headVar;
+                }
+                strcpy(newVar->value, token->value);
+                strcat(newVar->value, ".");
+                strcat(newVar->value, tempToken->value);
+            }else {
+                newVar->value = malloc(sizeof(char) * strlen(token->value) + 1);
+                strcpy(newVar->value, token->value);
+            }
+        } else {
+            newVar->type = INT;
+            newVar->value = malloc(sizeof(char) * strlen(token->value) + 1);
+            if (newVar->value == NULL) {
+                printf("Erreur pour l'allocation en mémoire de la valeur de la variable\n");
+                freeVariable(newVar);
+                return headVar;
+            }
+            strcpy(newVar->value, token->value);
+        }
+    }
+
+    // ajout de la variable à la fin
     newVar->nextVar = NULL;
-    if(headVar == NULL) {
+    if (headVar == NULL) {
         return newVar;
     }
-    Var * temp = headVar;
-    while (temp->nextVar != NULL) {
-        temp = temp->nextVar;
+    Var *lastVar = headVar;
+    while (lastVar->nextVar != NULL) {
+        lastVar = lastVar->nextVar;
     }
-    temp->nextVar = newVar;
+    lastVar->nextVar = newVar;
 
     return headVar;
 }
@@ -180,7 +179,8 @@ void printVariables(Var *var) {
     printf("Variables enregistrees :\n");
     while (var != NULL) {
         printf("%s %s %s\n", getVarType(var->type), var->name, var->value);
-        var = var->nextVar;}
+        var = var->nextVar;
+    }
 }
 
 // freeVariables
@@ -194,9 +194,9 @@ void freeVariable(Var *variable) {
 }
 
 int getListLength(Token *token) {
-    if(token == NULL) return 0;
+    if (token == NULL) return 0;
     int count = 0;
-    while (token!=NULL) {
+    while (token != NULL) {
         count++;
         token = token->nextToken;
     }
@@ -204,9 +204,9 @@ int getListLength(Token *token) {
 }
 
 int isCalcul(Token *token) {
-    if(token == NULL) return 0;
+    if (token == NULL) return 0;
     int count = 0;
-    while (token!=NULL) {
+    while (token != NULL) {
         count++;
         token = token->nextToken;
     }

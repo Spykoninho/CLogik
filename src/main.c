@@ -8,14 +8,14 @@ int main(void) {
     char input[255]; // Code de 255 caractères maximum
     //fgets(input, 255, stdin); // Entrée utilisateur
     Var * variable = NULL;
-    //parser(input); // On effectue le code
-
-    variable = addVariable("a=23.10", variable);
-    //variable = addVariable("b=\"Bonjour\"", variable);
-    //variable = addVariable("c=12.3", variable);
-    //variable = addVariable("d=255.", variable);
-
-    printVariables(variable);
-    freeVariable(variable);
+    parser("3 + 2 * 4 + 2"); // On effectue le code
+/*
+    variable = addVariable("a=23", variable);
+    variable = addVariable("b=\"Bonjour Monsieur.\"", variable);
+    variable = addVariable("c=12.3", variable);
+    variable = addVariable("d=a+c", variable);
+*/
+    //printVariables(variable);
+   // freeVariable(variable);
     return 0;
 }

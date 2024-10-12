@@ -49,6 +49,9 @@ Token *lexer(char *string, Token *token) {
             case '.':
                 token = addToken(token, DOT, stringValue);
                 break;
+            case '=':
+                token = addToken(token, ASSIGN, stringValue);
+            break;
         }
         // rajouter les < > & | = ! % >= <= == !=
         if (*string >= '0' && *string <= '9') {
