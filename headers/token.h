@@ -10,22 +10,31 @@ typedef struct token {
     Type type;
     char *value;
     struct token *nextToken;
+    struct token *previousToken;
 } Token;
 
 Token *addToken(Token *, const Type, const char *);
 
+void freeTokens(Token *);
+
 void freeToken(Token *);
 
-void printToken(Token *);
-void printoneStToken(StToken* actualStToken);
+void printTokens(Token * tokens);
 
-void tokensToShuttingYardLinkedList(const Token *, char ***, int *, StToken **);
+void printToken(Token * token);
+
+Token * tokensToShuttingYardLinkedList(Token *);
 
 int isBufferOperatorPriority(Type bufferType, Type operatorType);
 
 int checkOperatorPriority(Type type);
 
 int isOperator(Type type);
-void calcul(StToken *stToken);
+
+void calcul(Token * stToken);
+
+Token *popBufferToken(Token *head);
+
+Token *addBufferToken(Token *head, const Type type, const char *value);
 
 #endif //TOKEN_H
