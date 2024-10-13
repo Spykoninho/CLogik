@@ -28,7 +28,7 @@ Token *addToken(Token *head, const Type type, const char *value) {
     // si c'est le 1er de la liste on le return tout de suite
     if (head == NULL) {
         freeTokens(head);
-        exit(0);
+        return newToken;
     }
 
     // on se prépare à parcourir la liste

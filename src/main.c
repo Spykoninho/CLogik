@@ -10,11 +10,10 @@ int main(void) {
     Var * variable = NULL;
     //parser("200 / (50 - 20) + 3 * (7 + 4)"); // On effectue le code
 
-
     variable = addVariable("a=23", variable);
     variable = addVariable("b=\"Bonjour Monsieur.\"", variable);
     variable = addVariable("c=12.3", variable);
-    variable = addVariable("d=a*2+a*b", variable);
+    variable = addVariable("d=a*2+a", variable);
 
     printVariables(variable);
     freeVariable(variable);
