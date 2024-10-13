@@ -29,4 +29,6 @@ void printVariables(Var *var);
 char * getVarType(int type);
 
 int getListLength(Token *token);
+
+int isVarExists(Var *var, const char *searchedVar);
 #endif //VARIABLE_H

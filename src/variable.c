@@ -19,23 +19,27 @@ Var *addVariable(char *input, Var *headVar) {
         return NULL;
     }
 
-    // Initialisation de la variable
-    Var *newVar = malloc(sizeof(Var));
-    if (newVar == NULL) {
-        printf("Erreur pour l'allocation en mémoire de la variable\n");
-        return NULL;
-    }
-
+    Var * newVar = NULL;
     // Assignation du nom de la variable
     if (strcmp(getType(token->type), "IDENTIFIER") == 0) {
-        newVar->name = malloc(sizeof(char) * strlen(token->value) + 1);
-        if (newVar->name == NULL) {
-            printf("Erreur pour l'allocation en mémoire du nom de la variable\n");
-            freeVariable(newVar);
-            return headVar;
+        if(isVarExists(headVar, token->value)) {
+            newVar = getVariable(headVar, token->value);
+        }else {
+            // Initialisation de la variable
+            newVar = malloc(sizeof(Var));
+            if (newVar == NULL) {
+                printf("Erreur pour l'allocation en mémoire de la variable\n");
+                return NULL;
+            }
+            newVar->name = malloc(sizeof(char) * strlen(token->value) + 1);
+            if (newVar->name == NULL) {
+                printf("Erreur pour l'allocation en mémoire du nom de la variable\n");
+                freeVariable(newVar);
+                return headVar;
+            }
+            strcpy(newVar->name, token->value);
+            token = token->nextToken;
         }
-        strcpy(newVar->name, token->value);
-        token = token->nextToken;
     } else {
         printf("Erreur de format pour initialiser la variable 1\n");
         freeVariable(newVar);
@@ -110,7 +114,6 @@ Var *addVariable(char *input, Var *headVar) {
                 token = token->nextToken;
             }
         }else {
-
             newVar->type = INT;
             int result = 0;
         }
@@ -145,6 +148,17 @@ Var *addVariable(char *input, Var *headVar) {
                 return headVar;
             }
             strcpy(newVar->value, token->value);
+        }
+    }else if(token != NULL && strcmp(getType(token->type), "IDENTIFIER") == 0) {
+        if(isVarExists(headVar, token->value)) {
+            printf("%s, %s\n", token->value, getType(token->type));
+            newVar->value = malloc(sizeof(char) * strlen(token->value) + 1);
+            strcpy(newVar->value, getVariable(headVar, token->value)->value);
+            newVar->type = getVariable(headVar, token->value)->type;
+        }else {
+            printf("La variable %s n'existe pas !\n", token->value);
+            freeVariable(newVar);
+            return headVar;
         }
     }
 
@@ -191,6 +205,16 @@ void freeVariable(Var *variable) {
         freeVariable(variable->nextVar);
         free(variable);
     }
+}
+
+int isVarExists(Var *var, const char *searchedVar) {
+    while (var != NULL) {
+        if (strcmp(var->name, searchedVar) == 0) {
+            return 1;
+        }
+        var = var->nextVar;
+    }
+    return 0;
 }
 
 int getListLength(Token *token) {
