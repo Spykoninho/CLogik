@@ -14,7 +14,8 @@ Token *addToken(Token *head, const Type type, const char *value) {
     Token *newToken = malloc(sizeof(Token));
     if (newToken == NULL) {
         printf("Erreur d'allocation mémoire pour le Token %s", value);
-        return NULL;
+        freeTokens(head);
+        exit(0);
     }
 
     // Met les valeurs
@@ -26,7 +27,8 @@ Token *addToken(Token *head, const Type type, const char *value) {
 
     // si c'est le 1er de la liste on le return tout de suite
     if (head == NULL) {
-        return newToken;
+        freeTokens(head);
+        exit(0);
     }
 
     // on se prépare à parcourir la liste
@@ -48,7 +50,8 @@ Token *addBufferToken(Token *head, const Type type, const char *value) {
     Token *newToken = malloc(sizeof(Token));
     if (newToken == NULL) {
         printf("Erreur d'allocation mémoire pour le Token %s", value);
-        return NULL;
+        freeTokens(head);
+        exit(0);
     }
 
     // Met les valeurs
@@ -128,9 +131,9 @@ double calcul(Token *token) {
         if (isOperator(actualStToken->type)) {
             // On récupère les deux derniers opérandes de la pile
             Token *op2Token = stTokenPile; // le dernier
-            if(stTokenPile == NULL || stTokenPile->previousToken == NULL) {
+            if (stTokenPile == NULL || stTokenPile->previousToken == NULL) {
                 printf("Erreur, token manquant");
-                return 0;
+                exit(0);
             }
             stTokenPile = stTokenPile->previousToken;
             Token *op1Token = stTokenPile; // l'avant-dernier
@@ -143,7 +146,7 @@ double calcul(Token *token) {
 
             if (op1Token->value == error1 || op2Token->value == error2) {
                 printf("Error converting operands to double.\n");
-                return 0;
+                exit(0);
             }
 
             // Effectuer le calcul en fonction de l'opérateur
@@ -160,16 +163,18 @@ double calcul(Token *token) {
                 case DIV:
                     if (operator2 == 0) {
                         printf("Division par zero interdit\n");
-                        return 0;
+                        freeTokens(token);
+                        exit(0);
                     }
                     result = operator1 / operator2;
                     break;
                 case MOD:
                     if (operator2 == 0) {
                         printf("Modulo par zero interdit.\n");
-                        return 0;
+                        freeTokens(token);
+                        exit(0);
                     }
-                    result = (long)operator1 % (long)operator2;
+                    result = (long) operator1 % (long) operator2;
                     break;
                 default:
                     printf("Mauvais opérateur\n");
@@ -198,15 +203,17 @@ double calcul(Token *token) {
     }
 
     // Récupérer le résultat final
-    char * error3;
-    if(stTokenPile!= NULL) result = strtod(stTokenPile->value, &error3);
+    char *error3;
+    if (stTokenPile != NULL) result = strtod(stTokenPile->value, &error3);
     else {
         printf("stTokenPile is empty\n");
-        return 0;
+        freeTokens(token);
+        exit(0);
     }
-    if(error3 == stTokenPile->value) {
+    if (error3 == stTokenPile->value) {
         printf("Error converting operands to double.\n");
-        return 0;
+        freeTokens(token);
+        exit(0);
     }
     freeToken(stTokenPile); // Libérer la mémoire du dernier token
     return result;
@@ -280,14 +287,19 @@ int isOperator(Type type) {
 
 void printToken(Token *token) {
     if (token != NULL) printf("{type: \"%s\", value: \"%s\"},\n", getType(token->type), token->value);
-    else printf("Erreur, token NULL");
+    else {
+        printf("Erreur, token NULL");
+        freeTokens(token);
+        exit(0);
+    }
 }
 
 // enleve le dernier ajouté
 Token *popBufferToken(Token *head) {
     if (head == NULL) {
         printf("Erreur, token NULL");
-        return NULL;
+        freeTokens(head);
+        exit(0);
     }
     Token *temp = head->nextToken;
     freeToken(head);
