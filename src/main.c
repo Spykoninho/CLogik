@@ -8,7 +8,7 @@ int main(void) {
     char input[255]; // Code de 255 caractères maximum
     //fgets(input, 255, stdin); // Entrée utilisateur
     Var * variable = NULL;
-    parser("7 + 2 * (3 + 1)"); // On effectue le code
+    parser("200 / (50 - 20) + 3 * (7 + 4)"); // On effectue le code
 
     /*
     variable = addVariable("a=23", variable);

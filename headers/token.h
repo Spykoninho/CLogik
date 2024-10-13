@@ -31,7 +31,7 @@ int checkOperatorPriority(Type type);
 
 int isOperator(Type type);
 
-void calcul(Token * stToken);
+double calcul(Token * stToken);
 
 Token *popBufferToken(Token *head);
 

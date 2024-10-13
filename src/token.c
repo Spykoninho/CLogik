@@ -71,21 +71,21 @@ void printTokens(Token *tokens) {
 }
 
 // Convertit la liste de token en liste chainée shuttingyard
-Token *tokensToShuttingYardLinkedList(Token *token) {
-    if (token == NULL) return NULL;
+Token *tokensToShuttingYardLinkedList(Token *tokens) {
+    if (tokens == NULL) return NULL;
     Token *buffer = NULL;
     Token *output = NULL;
-    while (token != NULL) {
+    while (tokens != NULL) {
         // Si la valeur est un nombre on le met directement dans l'output
-        if (strcmp(getType(token->type), "NUMBER") == 0) {
-            output = addToken(output, token->type, token->value);
+        if (strcmp(getType(tokens->type), "NUMBER") == 0) {
+            output = addToken(output, tokens->type, tokens->value);
         }
 
-        if (strcmp(getType(token->type), "LPAREN") == 0) {
-            buffer = addBufferToken(buffer, token->type, token->value);
+        if (strcmp(getType(tokens->type), "LPAREN") == 0) {
+            buffer = addBufferToken(buffer, tokens->type, tokens->value);
         }
 
-        if (strcmp(getType(token->type), "RPAREN") == 0) {
+        if (strcmp(getType(tokens->type), "RPAREN") == 0) {
             while (buffer != NULL && strcmp(buffer->value, "(") != 0) {
                 output = addToken(output, buffer->type, buffer->value);
                 buffer = popBufferToken(buffer);
@@ -96,102 +96,120 @@ Token *tokensToShuttingYardLinkedList(Token *token) {
         }
 
         // si c'est un opérateur on le met dans le buffer
-        if (isOperator(token->type)) {
+        if (isOperator(tokens->type)) {
             while (buffer != NULL &&
-                   isBufferOperatorPriority(buffer->type, token->type)) {
+                   isBufferOperatorPriority(buffer->type, tokens->type)) {
                 output = addToken(output, buffer->type, buffer->value);
                 buffer = popBufferToken(buffer);
             }
-            buffer = addBufferToken(buffer, token->type, token->value);
+            buffer = addBufferToken(buffer, tokens->type, tokens->value);
         }
         // on passe au token suivant
-        token = token->nextToken;
+        tokens = tokens->nextToken;
     }
     // on ajoute à la fin les opérateurs restants
     while (buffer != NULL) {
         output = addToken(output, buffer->type, buffer->value);
         buffer = popBufferToken(buffer);
     }
-    printTokens(output);
-    calcul(output);
+    freeTokens(buffer);
+    freeTokens(tokens);
     return output;
 }
 
-void calcul(Token *stToken) {
+double calcul(Token *token) {
+    Token *stToken = tokensToShuttingYardLinkedList(token);
     Token *stTokenPile = NULL;
     Token *actualStToken = stToken;
+    double result = 0;
+
     while (actualStToken != NULL) {
-        if (isOperator(actualStToken->type)) // si on a un opérateur, on fait le calcul
-        {
-            char *op1 = actualStToken->previousToken->previousToken->value;
-            // on prend les deux derniers éléments de la stTokenPile
-            char *op2 = actualStToken->previousToken->value;
-            int result = 0;
-            char *error1;
-            long operator1 = strtol(op1, &error1, 10);
-            if (op1 == error1) {
-                printf("Error op 1");
+        // Si c'est un opérateur, on effectue le calcul
+        if (isOperator(actualStToken->type)) {
+            // On récupère les deux derniers opérandes de la pile
+            Token *op2Token = stTokenPile; // le dernier
+            if(stTokenPile == NULL || stTokenPile->previousToken == NULL) {
+                printf("Erreur, token manquant");
+                return 0;
             }
-            char *error2;
-            long operator2 = strtol(op2, &error2, 10);
-            if (op2 == error2) {
-                printf("Error op 2");
+            stTokenPile = stTokenPile->previousToken;
+            Token *op1Token = stTokenPile; // l'avant-dernier
+            stTokenPile = stTokenPile->previousToken;
+
+            // Convertir les opérandes en double
+            char *error1, *error2;
+            double operator1 = strtod(op1Token->value, &error1);
+            double operator2 = strtod(op2Token->value, &error2);
+
+            if (op1Token->value == error1 || op2Token->value == error2) {
+                printf("Error converting operands to double.\n");
+                return 0;
             }
-            switch (actualStToken->type) // on fait le calcul, si on a les deux opérandes
-            {
-                // dans la stTokenPile on aura un truc qui ressemblera à ça : [1,4,+, 2, *] => (1 + 4) * 2
-                // op1 = 4, op2 = 1, actualStToken = +
+
+            // Effectuer le calcul en fonction de l'opérateur
+            switch (actualStToken->type) {
                 case PLUS:
                     result = operator1 + operator2;
-                    if (operator1 != 0 && operator2 != 0 && result - operator1 != operator2) {
-                        printf("Overflow detected. The result might not be accurate.\n");
-                    }
                     break;
                 case MINUS:
                     result = operator1 - operator2;
                     break;
                 case MULT:
                     result = operator1 * operator2;
-                    if (operator1 != 0 && operator2 != 0 && result / operator1 != operator2) {
-                        printf("Overflow detected. The result might not be accurate.\n");
-                    }
                     break;
                 case DIV:
                     if (operator2 == 0) {
-                        printf("Division by zero\n");
+                        printf("Division par zero interdit\n");
+                        return 0;
                     }
                     result = operator1 / operator2;
                     break;
                 case MOD:
                     if (operator2 == 0) {
-                        printf("Modulo by zero\n");
+                        printf("Modulo par zero interdit.\n");
+                        return 0;
                     }
-                    result = operator1 % operator2;
+                    result = (long)operator1 % (long)operator2;
                     break;
                 default:
-                    break;
+                    printf("Mauvais opérateur\n");
+                    return 0;
             }
-            actualStToken->previousToken->previousToken->value = malloc(sizeof(char) * 100);
-            itoa(result, actualStToken->previousToken->previousToken->value, 10);
-            // on met le résultat à la place du premier opérande. itoa permet de convertir un int en char *, c'est l'inverse de itoa que j'ai changé en strtol (lol)
-            Token *oldStTokenPile = stTokenPile;
-            stTokenPile = stTokenPile->previousToken;
-            free(oldStTokenPile);
+
+            // Mettre le résultat dans la pile
+            char *resultValue = malloc(sizeof(char) * 100);
+            sprintf(resultValue, "%lf", result);
+
+            Token *resultToken = malloc(sizeof(Token));
+            resultToken->type = NUMBER;
+            resultToken->value = resultValue;
+            resultToken->previousToken = stTokenPile;
+            stTokenPile = resultToken; // Premier arrivé futur premier à sortir (Last in first out)
+
+            // Libérer les opérandes après le calcul
+            freeToken(op1Token);
+            freeToken(op2Token);
         } else {
-            // si c'est pas un opérateur, on met l'élément dans la stTokenPile, du coup on a toujours les deux derniers éléments de la stTokenPile qui seront les opérandes
-            if (stTokenPile == NULL) {
-                stTokenPile = actualStToken;
-            } else {
-                stTokenPile->nextToken = actualStToken;
-                actualStToken->previousToken = stTokenPile;
-                stTokenPile = actualStToken;
-            }
+            // Si ce n'est pas un opérateur, on push l'élément dans la pile
+            actualStToken->previousToken = stTokenPile;
+            stTokenPile = actualStToken;
         }
         actualStToken = actualStToken->nextToken;
     }
-    printf("--------------------------------------------------------------\n");
-    printf("Result : %s\n", stTokenPile->value); // on affiche le résultat
-    printf("--------------------------------------------------------------\n");
+
+    // Récupérer le résultat final
+    char * error3;
+    if(stTokenPile!= NULL) result = strtod(stTokenPile->value, &error3);
+    else {
+        printf("stTokenPile is empty\n");
+        return 0;
+    }
+    if(error3 == stTokenPile->value) {
+        printf("Error converting operands to double.\n");
+        return 0;
+    }
+    freeToken(stTokenPile); // Libérer la mémoire du dernier token
+    return result;
 }
 
 // Libère les tokens

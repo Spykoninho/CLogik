@@ -19,7 +19,8 @@ void parser(char *input) {
     // Si il y a bien des instructions
     if (inputToken != NULL) {
         // on copie le resultat de la fonction qui permet de l'avoir dans notre string
-        tokensToShuttingYardLinkedList(inputToken);
+        double result = calcul(inputToken);
+        printf("Result : %lf\n", result);
 
         // On free tout
         freeToken(inputToken);
