@@ -4,36 +4,37 @@
 
 #ifndef TOKEN_H
 #define TOKEN_H
-
-typedef enum inputType {
-    NUMBER, // 0 1 2 3...
-    KEYWORD, // if...
-    LPAREN, // (
-    RPAREN, // )
-    IDENTIFIER, // variable
-    OPERATOR, // <, &&...
-    LBRACE, // {
-    RBRACE, // }
-    SEMICOLON, // ;
-    ASSIGN // =
-} Type;
+#include "parser.h"
 
 typedef struct token {
     Type type;
     char *value;
     struct token *nextToken;
+    struct token *previousToken;
 } Token;
 
 Token *addToken(Token *, const Type, const char *);
 
+void freeTokens(Token *);
+
 void freeToken(Token *);
 
-void printToken(Token *);
+void printTokens(Token * tokens);
 
-char *tokensToShuttingYardString(Token *, char ***, int *, char *);
+void printToken(Token * token);
 
-int isBufferOperatorPriority(char * bufferOperator, char * tokenOperator);
+Token * tokensToShuttingYardLinkedList(Token *);
 
-int checkOperatorPriority(const char * operator);
+int isBufferOperatorPriority(Type bufferType, Type operatorType);
+
+int checkOperatorPriority(Type type);
+
+int isOperator(Type type);
+
+double calcul(Token * stToken);
+
+Token *popBufferToken(Token *head);
+
+Token *addBufferToken(Token *head, const Type type, const char *value);
 
 #endif //TOKEN_H

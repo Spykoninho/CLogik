@@ -9,4 +9,6 @@ add_executable(CLogik src/main.c
         src/token.c
         headers/lexer.h
         src/parser.c
-        headers/parser.h)
+        headers/parser.h
+        src/variable.c
+        headers/variable.h)
