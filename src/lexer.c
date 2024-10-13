@@ -56,7 +56,7 @@ Token *lexer(char *string, Token *token) {
         // rajouter les < > & | = ! % >= <= == !=
         if (*string >= '0' && *string <= '9') {
             char numberString[255] = "";
-            while (*string >= '0' && *string <= '9') {
+            while (*string >= '0' && *string <= '9'|| *string == '.') {
                 char NumberToString[2] = {*string, '\0'};
                 strcat(numberString, NumberToString);
                 *string++;
