@@ -7,6 +7,7 @@
 #include "../headers/token.h"
 #include "../headers/parser.h"
 #include "../headers/lexer.h"
+#include "../headers/print.h"
 
 #define BUFFER_SIZE 1024
 #define SHUTTINGYARDSTRING_SIZE 1024
@@ -20,6 +21,9 @@ void parser(char *input) {
     printToken(inputToken);
     // Si il y a bien des instructions
     if (inputToken != NULL) {
+        if (inputToken->type == PRINT) {
+            parserPrint(inputToken);
+        }
         // on copie le resultat de la fonction qui permet de l'avoir dans notre string
         double result = calcul(inputToken);
         printf("Result : %lf\n", result);
