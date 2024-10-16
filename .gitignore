@@ -52,3 +52,11 @@ Mkfile.old
 dkms.conf
 
 /cmake-build-debug
+
+# Editors
+
+.vscode/
+.idea/
+*.swp
+*~
+*.bak
