@@ -29,6 +29,7 @@ typedef enum inputType {
     ASSIGN, // =
     QUOTES, // "
     DOT, // .
+    PRINT, // print
     UNKNOWN = -1      // quand le lexer sait pas ou que c'est pas encore implémenté
 } Type;
 
