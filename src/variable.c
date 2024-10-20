@@ -14,6 +14,7 @@ Var *addVariable(char *input, Var *headVar) {
     Token *token = NULL;
     // Conversion de l'input en tokens
     token = lexer(input, token);
+    printTokens(token);
     if (token == NULL) {
         printf("Erreur dans a récupération des tokens\n");
         freeVariable(headVar);
@@ -73,8 +74,88 @@ Var *addVariable(char *input, Var *headVar) {
         temp = temp->nextToken;
     }
 
-    // POUR STRING
-    if (token != NULL && strcmp(getType(token->type), "QUOTES") == 0) {
+    if (isCalcul) {
+        // Si c'est un calcul
+        if (token != NULL && strcmp(getType(token->type), "QUOTES") == 0) {
+            newVar->type = STRING;
+            token = token->nextToken; // on saute la première "
+
+            char *longString = malloc(sizeof(char) * 255);
+            if (longString == NULL) {
+                printf("Erreur d'allocation en mémoire\n");
+                freeVariable(newVar);
+                freeVariable(headVar);
+                exit(0);
+            }
+            longString[0] = '\0';
+
+            // Ajout de la première partie de la chaîne
+            while (token != NULL && strcmp(getType(token->type), "QUOTES") != 0) {
+                strncat(longString, token->value, 255 - strlen(longString));
+                token = token->nextToken;
+            }
+
+            // Vérification du + pour concaténer d'autres chaînes
+            while (token != NULL && strcmp(getType(token->type), "PLUS") == 0) {
+                token = token->nextToken; // On saute le +
+
+                // Ajouter un espace avant de concaténer la prochaine chaîne
+                strcat(longString, " ");
+
+                if (token != NULL && strcmp(getType(token->type), "QUOTES") == 0) {
+                    token = token->nextToken; // On saute la première "
+
+                    while (token != NULL && strcmp(getType(token->type), "QUOTES") != 0) {
+                        strncat(longString, token->value, 255 - strlen(longString));
+                        token = token->nextToken;
+                    }
+                    token = token->nextToken; // On saute la fermeture des guillemets
+                }
+            }
+
+            // Affectation du résultat à la variable
+            newVar->value = malloc(sizeof(char) * strlen(longString) + 1);
+            if (newVar->value == NULL) {
+                printf("Erreur pour l'allocation en mémoire\n");
+                free(longString);
+                freeVariable(newVar);
+                freeVariable(headVar);
+                exit(0);
+            }
+            strcpy(newVar->value, longString);
+            free(longString);
+        } else {
+            Token *tempTokenCalcul = token;
+            while (tempTokenCalcul != NULL) {
+                if (strcmp(getType(tempTokenCalcul->type), "IDENTIFIER") == 0) {
+                    if (isVarExists(headVar, tempTokenCalcul->value)) {
+                        Var *var = getVariable(headVar, tempTokenCalcul->value);
+                        tempTokenCalcul->value = realloc(tempTokenCalcul->value, sizeof(char) * strlen(var->value) + 1);
+                        strcpy(tempTokenCalcul->value, var->value);
+                        tempTokenCalcul->type = NUMBER;
+                    } else {
+                        printf("La variable %s n'existe pas !\n", tempTokenCalcul->value);
+                        freeVariable(headVar);
+                        freeVariable(newVar);
+                        exit(0);
+                    }
+                }
+                tempTokenCalcul = tempTokenCalcul->nextToken;
+            }
+            double result = calcul(token);
+            char *resultString = malloc(sizeof(char) * 100);
+            if (isDot) {
+                newVar->type = DOUBLE;
+                sprintf(resultString, "%lf", result);
+            } else {
+                newVar->type = INT;
+                sprintf(resultString, "%d", (int) result);
+            }
+            newVar->value = malloc(sizeof(char) * strlen(resultString) + 1);
+            strcpy(newVar->value, resultString);
+        }
+    } else if (token != NULL && strcmp(getType(token->type), "QUOTES") == 0) {
+        // POUR STRING
         newVar->type = STRING;
         token = token->nextToken;
 
@@ -113,37 +194,6 @@ Var *addVariable(char *input, Var *headVar) {
         }
         strcpy(newVar->value, longString);
         free(longString);
-    } else if (isCalcul) {
-        // Si c'est un calcul
-        Token *tempTokenCalcul = token;
-        while (tempTokenCalcul != NULL) {
-            if (strcmp(getType(tempTokenCalcul->type), "IDENTIFIER") == 0) {
-                if (isVarExists(headVar, tempTokenCalcul->value)) {
-                    Var *var = getVariable(headVar, tempTokenCalcul->value);
-                    tempTokenCalcul->value = realloc(tempTokenCalcul->value, sizeof(char) * strlen(var->value) + 1);
-                    strcpy(tempTokenCalcul->value, var->value);
-                    tempTokenCalcul->type = NUMBER;
-                    printToken(tempTokenCalcul);
-                } else {
-                    printf("La variable %s n'existe pas !\n", tempTokenCalcul->value);
-                    freeVariable(headVar);
-                    freeVariable(newVar);
-                    exit(0);
-                }
-            }
-            tempTokenCalcul = tempTokenCalcul->nextToken;
-        }
-        double result = calcul(token);
-        char *resultString = malloc(sizeof(char) * 100);
-        if (isDot) {
-            newVar->type = DOUBLE;
-            sprintf(resultString, "%lf", result);
-        } else {
-            newVar->type = INT;
-            sprintf(resultString, "%d", (int) result);
-        }
-        newVar->value = malloc(sizeof(char) * strlen(resultString) + 1);
-        strcpy(newVar->value, resultString);
     } else if (token != NULL && strcmp(getType(token->type), "NUMBER") == 0) {
         // Pour les nombres
         Token *tempToken = token->nextToken;
