@@ -14,7 +14,8 @@ int main(void) {
     variable = addVariable("a=23", variable);
     variable = addVariable("b=\"Bonjour Monsieur.\"", variable);
     variable = addVariable("c=12.3", variable); */
-    variable = addVariable("d=\"Hello\" + \"World\"", variable);
+    variable = addVariable("a=\"Bonjour\"", variable);
+    variable = addVariable("d=\"Hello World\" + a + \"LOLL AHAH\"", variable);
 
     printVariables(variable);
     freeVariable(variable);
