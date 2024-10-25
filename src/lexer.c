@@ -50,10 +50,37 @@ Token *lexer(char *string, Token *token) {
                 token = addToken(token, DOT, stringValue);
                 break;
             case '=':
-                token = addToken(token, ASSIGN, stringValue);
+                if (*(string + 1) == '=') {
+                    token = addToken(token, EQUAL, ">=");
+                    string++;
+                } else {
+                    token = addToken(token, ASSIGN, stringValue);
+                }
             break;
+            case '>':
+                if (*(string + 1) == '=') {
+                    token = addToken(token, GREATEREQ, ">=");
+                    string++;
+                } else {
+                    token = addToken(token, GREATER, stringValue);
+                }
+                break;
+            case '<':
+                if (*(string + 1) == '=') {
+                    token = addToken(token, LESSEQ, "<=");
+                    string++;
+                } else {
+                    token = addToken(token, LESS, stringValue);
+                }
+                break;
+            case '!':
+                if (*(string + 1) == '=') {
+                    token = addToken(token, NOT, "!=");
+                    string++;
+                } else {
+                    token = addToken(token, NOT, stringValue);
+                }
         }
-        // rajouter les < > & | = ! % >= <= == !=
         if (*string >= '0' && *string <= '9') {
             char numberString[255] = "";
             while (*string >= '0' && *string <= '9'|| *string == '.') {
