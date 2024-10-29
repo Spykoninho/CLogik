@@ -10,13 +10,14 @@ int main(void) {
     Var * variable = NULL;
    // parser("3.5+2"); // On effectue le code
 
-    /*variable = addVariable("z=3.5+2", variable);
+
+    variable = addVariable("z=3.5+2", variable);
     variable = addVariable("a=23", variable);
     variable = addVariable("b=\"Bonjour Monsieur.\"", variable);
-    variable = addVariable("c=12.3", variable); */
-    variable = addVariable("a=\"Bonjour\"", variable);
-    variable = addVariable("d=\"Hello World\" + a + \"LOLL AHAH\"", variable);
+    variable = addVariable("c=12.3", variable);
+    variable = addVariable("A=\"Bonjour\"", variable);
 
+    variable = addVariable("d=2.2+7", variable);
     printVariables(variable);
     freeVariable(variable);
     return 0;

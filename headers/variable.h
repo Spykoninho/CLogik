@@ -31,4 +31,6 @@ char * getVarType(int type);
 int getListLength(Token *token);
 
 int isVarExists(Var *var, const char *searchedVar);
+
+int isTokenDouble(char * value);
 #endif //VARIABLE_H
