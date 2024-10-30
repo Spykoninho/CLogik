@@ -11,4 +11,6 @@ add_executable(CLogik src/main.c
         src/parser.c
         headers/parser.h
         src/variable.c
-        headers/variable.h)
+        headers/variable.h
+        src/validator.c
+        headers/validator.h)
