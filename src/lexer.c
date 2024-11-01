@@ -43,15 +43,12 @@ Token *lexer(char *string, Token *token) {
             case '^':
                 token = addToken(token, POW, stringValue);
                 break;
-            case '"':
-                token = addToken(token, QUOTES, stringValue);
-                break;
             case '.':
                 token = addToken(token, DOT, stringValue);
                 break;
             case '=':
                 if (*(string + 1) == '=') {
-                    token = addToken(token, EQUAL, ">=");
+                    token = addToken(token, EQUAL, "==");
                     string++;
                 } else {
                     token = addToken(token, ASSIGN, stringValue);
@@ -75,7 +72,7 @@ Token *lexer(char *string, Token *token) {
                 break;
             case '!':
                 if (*(string + 1) == '=') {
-                    token = addToken(token, NOT, "!=");
+                    token = addToken(token, NOTEQUAL, "!=");
                     string++;
                 } else {
                     token = addToken(token, NOT, stringValue);
@@ -83,7 +80,7 @@ Token *lexer(char *string, Token *token) {
         }
         if (*string >= '0' && *string <= '9') {
             char numberString[255] = "";
-            while (*string >= '0' && *string <= '9'|| *string == '.') {
+            while (*string >= '0' && *string <= '9' || *string == '.') {
                 char NumberToString[2] = {*string, '\0'};
                 strcat(numberString, NumberToString);
                 *string++;
@@ -92,9 +89,27 @@ Token *lexer(char *string, Token *token) {
             continue;
         }
 
+        if (*string == '"') {
+            *string++;
+            char longString[255] = "";
+            while (*string != '"' && *string != '\0') {
+                char charToString[2] = {*string, '\0'};
+                strcat(longString, charToString);
+                string++;
+            }
+            if (*string == '\0') {
+                printf("Error lexer : il manque une \"");
+                exit(1);
+            }
+            *string++;
+            token = addToken(token, TOKENSTRING, longString);
+            continue;
+        }
+
         if (*string >= 'a' && *string <= 'z' || *string >= 'A' && *string <= 'Z') {
             char longString[255] = "";
-            while (*string >= 'a' && *string <= 'z' || *string >= 'A' && *string <= 'Z') {
+            while (*string >= 'a' && *string <= 'z' || *string >= 'A' && *string <= 'Z' || *string >= '0' && *string <=
+                   '9') {
                 char charToString[2] = {*string, '\0'};
                 strcat(longString, charToString);
                 *string++;
@@ -112,6 +127,8 @@ char *getType(int type) {
     switch (type) {
         case NUMBER:
             return "NUMBER";
+        case TOKENSTRING:
+            return "TOKENSTRING";
         case KEYWORD:
             return "KEYWORD";
         case LPAREN:
@@ -126,6 +143,8 @@ char *getType(int type) {
             return "MINUS";
         case NOT:
             return "NOT";
+        case NOTEQUAL:
+            return "NOTEQUAL";
         case MULT:
             return "MULT";
         case DIV:
@@ -152,8 +171,6 @@ char *getType(int type) {
             return "SEMICOLON";
         case ASSIGN:
             return "ASSIGN";
-        case QUOTES:
-            return "QUOTES";
         case DOT:
             return "DOT";
         default:

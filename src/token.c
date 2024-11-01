@@ -122,6 +122,7 @@ Token *tokensToShuttingYardLinkedList(Token *tokens) {
 
 double calcul(Token *token) {
     Token *stToken = tokensToShuttingYardLinkedList(token);
+    printTokens(stToken);
     Token *stTokenPile = NULL;
     Token *actualStToken = stToken;
     double result = 0;
@@ -143,7 +144,6 @@ double calcul(Token *token) {
             char *error1, *error2;
             double operator1 = strtod(op1Token->value, &error1);
             double operator2 = strtod(op2Token->value, &error2);
-
             if (op1Token->value == error1 || op2Token->value == error2) {
                 printf("Error converting operands to double.\n");
                 exit(0);
