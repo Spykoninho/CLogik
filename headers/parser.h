@@ -7,6 +7,7 @@
 
 typedef enum inputType {
     NUMBER, // 0 1 2 3...
+    TOKENSTRING,
     KEYWORD, // if...
     LPAREN, // (
     RPAREN, // )

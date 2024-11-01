@@ -305,11 +305,8 @@ Var *getVariable(Var *var, char *searchedVar) {
 
 // printVariables
 void printVariables(Var *var) {
-    printf("Variables enregistrees :\n");
-    while (var != NULL) {
-        printf("%s %s %s\n", getVarType(var->type), var->name, var->value);
-        var = var->nextVar;
-    }
+    if(var->nextVar!=NULL) printVariables(var->nextVar);
+    printf("%s %s %s\n", getVarType(var->type), var->name, var->value);
 }
 
 // freeVariables
