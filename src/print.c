@@ -1,8 +1,8 @@
 #include "../headers/print.h"
 #include "../headers/token.h"
+#include "../headers/variable.h"
 #include <stdio.h>
 #include <stdlib.h>
-
 
 /**
  * @brief Check if the print parenthesis is valid
@@ -33,6 +33,7 @@ int checkValidPrint(Token** token) {
 void parserPrint(Token *token) {
     double *responseDouble = NULL;
     char *responseString = NULL;
+    extern Var *variable;
 
     if (token == NULL || token->type != PRINT) {
         printf("Error: print function not found\n");
@@ -52,7 +53,31 @@ void parserPrint(Token *token) {
         return;
     }
 
-    double result = calcul(token);
+    if (token->type == IDENTIFIER) {
+        Var *var = getVariable(variable, token->value);
+        
+        if (var == NULL) {
+            printf("Error: variable %s not found\n", token->value);
+            return;
+        }
+
+        if (var->type == INT) {
+            responseString = malloc(sizeof(char) * 255);
+            sprintf(responseString, "%s", var->value);
+        } else if (var->type == DOUBLE) {
+            responseDouble = malloc(sizeof(double));
+            *responseDouble = atof(var->value);
+        } else {
+            responseString = malloc(sizeof(char) * 255);
+            sprintf(responseString, "%s", var->value);
+        }
+    } else if (token->type == NUMBER) {
+        responseDouble = malloc(sizeof(double));
+        *responseDouble = calcul(token);
+        printf("Result Print: %g\n", *responseDouble);
+    }
+
+    token = token->nextToken;
 
     // Check if the print parenthesis is valid
     if (!checkValidPrint(&token)) {
@@ -64,6 +89,7 @@ void parserPrint(Token *token) {
         printf("Error: missing ')' after print\n");
         return;
     }
+    printf("Token value : %s\n", token->value);
 
-    printf("Result Print: %g\n", result);
+    // printf("Result Print: %g\n", result);
 }
