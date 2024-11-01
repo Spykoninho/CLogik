@@ -18,12 +18,13 @@ typedef enum inputType {
     DIV, // /
     MOD, // % (à implémenter avec les conditions)
     POW,
-    GREATER, // > (à implémenter avec les conditions)
-    LESS, // < (à implémenter avec les conditions)
-    GREATEREQ, // >= (à implémenter avec les conditions)
-    LESSEQ, // <= (à implémenter avec les conditions)
-    EQUAL, // == (à implémenter avec les conditions)
-    NOT, // ! (à implémenter avec les conditions)
+    GREATER, // >
+    LESS, // <
+    GREATEREQ, // >=
+    LESSEQ, // <=
+    EQUAL, // ==
+    NOT, // !
+    NOTEQUAL, // !=
     LBRACE, // {
     RBRACE, // }
     SEMICOLON, // ;

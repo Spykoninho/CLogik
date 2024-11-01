@@ -48,7 +48,7 @@ Token *lexer(char *string, Token *token) {
                 break;
             case '=':
                 if (*(string + 1) == '=') {
-                    token = addToken(token, EQUAL, ">=");
+                    token = addToken(token, EQUAL, "==");
                     string++;
                 } else {
                     token = addToken(token, ASSIGN, stringValue);
@@ -72,7 +72,7 @@ Token *lexer(char *string, Token *token) {
                 break;
             case '!':
                 if (*(string + 1) == '=') {
-                    token = addToken(token, NOT, "!=");
+                    token = addToken(token, NOTEQUAL, "!=");
                     string++;
                 } else {
                     token = addToken(token, NOT, stringValue);
@@ -143,6 +143,8 @@ char *getType(int type) {
             return "MINUS";
         case NOT:
             return "NOT";
+        case NOTEQUAL:
+            return "NOTEQUAL";
         case MULT:
             return "MULT";
         case DIV:
