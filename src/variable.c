@@ -15,7 +15,6 @@ Var *addVariable(char *input, Var *headVar) {
 
     // Conversion de l'input en tokens
     token = lexer(input, token);
-    printToken(token);
     printTokens(token);
 
     if (token == NULL) {
@@ -25,11 +24,13 @@ Var *addVariable(char *input, Var *headVar) {
     }
 
     Var *newVar = NULL;
+    int isVarExist = 0;
 
     // Assignation du nom de la variable
     if (strcmp(getType(token->type), "IDENTIFIER") == 0) {
         if (isVarExists(headVar, token->value)) {
             newVar = getVariable(headVar, token->value);
+            isVarExist = 1;
         } else {
             // Initialisation de la variable
             newVar = malloc(sizeof(Var));
@@ -48,8 +49,8 @@ Var *addVariable(char *input, Var *headVar) {
             }
 
             strcpy(newVar->name, token->value);
-            token = token->nextToken;
         }
+        token = token->nextToken;
     } else {
         printf("Erreur : format incorrect pour l'initialisation de la variable\n");
         freeVariable(headVar);
@@ -68,11 +69,11 @@ Var *addVariable(char *input, Var *headVar) {
 
     // Vérification s'il y a un calcul ou une simple assignation
     int isCalcul = 0;
-    int countQuotes = 0;
+    int isString = 0;
     Token *temp = token;
     while (temp != NULL) {
-        if (strcmp(getType(temp->type), "QUOTES") == 0) countQuotes++;
-        if (isOperator(temp->type) && countQuotes % 2 == 0) isCalcul = 1;
+        if (strcmp(getType(temp->type), "TOKENSTRING") == 0) isString++;
+        if (isOperator(temp->type)) isCalcul = 1;
         temp = temp->nextToken;
     }
 
@@ -83,68 +84,43 @@ Var *addVariable(char *input, Var *headVar) {
             if (isVarExists(headVar, token->value)) {
                 Var *checkVar = getVariable(headVar, token->value);
                 if (strcmp(getVarType(checkVar->type), "STRING") == 0) isVarString = 1;
+            } else {
+                printf("Erreur : La variable n'existe pas\n");
+                freeVariable(headVar);
+                free(newVar);
+                exit(1);
             }
         }
         // Traitement des chaînes de caractères
-        if (strcmp(getType(token->type), "QUOTES") == 0 || isVarString) {
+        if (strcmp(getType(token->type), "TOKENSTRING") == 0 || isVarString) {
             newVar->type = STRING;
-            if (strcmp(getType(token->type), "QUOTES") == 0) token = token->nextToken; // On saute le premier guillemet
 
-            char *longString = malloc(255);
+            char *longString = malloc(255 * sizeof(char));
             if (longString == NULL) {
                 printf("Erreur d'allocation de memoire\n");
                 freeVariable(newVar);
                 freeVariable(headVar);
                 exit(1);
             }
-
             longString[0] = '\0';
-            int countForSpace = 0;
+
             if (isVarString) {
                 Var *var = getVariable(headVar, token->value);
                 strncat(longString, var->value, 255 - strlen(longString));
             } else {
-                while (token != NULL && strcmp(getType(token->type), "QUOTES") != 0) {
-                    if (countForSpace % 2 == 0) strcat(longString, " ");
-                    strncat(longString, token->value, 255 - strlen(longString));
-                    token = token->nextToken;
-                    countForSpace++;
-                }
+                strncat(longString, token->value, 255 - strlen(longString));
             }
-
-            if (token == NULL) {
-                printf("Erreur : guillemet fermant manquant\n");
-                free(longString);
-                freeVariable(headVar);
-                exit(1);
-            }
-
-            token = token->nextToken; // Sauter le guillemet fermant
+            token = token->nextToken;
 
             // Traitement des concaténations
             while (token != NULL && strcmp(getType(token->type), "PLUS") == 0) {
                 token = token->nextToken; // Sauter le '+'
 
-                if (strcmp(getType(token->type), "QUOTES") == 0) {
-                    token = token->nextToken;
-                    countForSpace = 0;
-                    while (token != NULL && strcmp(getType(token->type), "QUOTES") != 0) {
-                        strncat(longString, token->value, 255 - strlen(longString));
-                        token = token->nextToken;
-                        if (countForSpace % 2 == 0) strcat(longString, " ");
-                        countForSpace++;
-                    }
-                    if (token == NULL) {
-                        printf("Erreur : guillemet fermant manquant après concaténation\n");
-                        free(longString);
-                        freeVariable(newVar);
-                        freeVariable(headVar);
-                        exit(1);
-                    }
-                    token = token->nextToken;
+                if (strcmp(getType(token->type), "TOKENSTRING") == 0) {
+                    strncat(longString, token->value, 255 - strlen(longString));
                 } else if (strcmp(getType(token->type), "IDENTIFIER") == 0) {
                     Var *var = getVariable(headVar, token->value);
-                    if (newVar->type != STRING) {
+                    if (strcmp(getVarType(var->type), "STRING") != 0) {
                         printf("Erreur : la concatenation doit être avec une chaîne de caractères\n");
                         free(longString);
                         freeVariable(newVar);
@@ -152,14 +128,14 @@ Var *addVariable(char *input, Var *headVar) {
                         exit(1);
                     }
                     strncat(longString, var->value, 255 - strlen(longString));
-                    token = token->nextToken;
                 } else {
-                    printf("Erreur : concaténation invalide\n");
+                    printf("Erreur : concatenation invalide\n");
                     free(longString);
                     freeVariable(newVar);
                     freeVariable(headVar);
                     exit(1);
                 }
+                token = token->nextToken;
             }
 
             newVar->value = malloc(strlen(longString) + 1);
@@ -183,18 +159,17 @@ Var *addVariable(char *input, Var *headVar) {
                         tempTokenCalcul->value = realloc(tempTokenCalcul->value,
                                                          sizeof(char) * (strlen(var->value) + 1));
                         strcpy(tempTokenCalcul->value, var->value);
-                        if(isTokenDouble(var->value)) {
-                            isDouble=1;
+                        if (isTokenDouble(var->value)) {
+                            isDouble = 1;
                         }
                         tempTokenCalcul->type = NUMBER;
                     } else {
                         printf("Erreur : variable '%s' inexistante\n", tempTokenCalcul->value);
                         freeVariable(headVar);
-                        freeVariable(newVar);
                         exit(1);
                     }
                 } else if (strcmp(getType(tempTokenCalcul->type), "NUMBER") == 0) {
-                    if(isTokenDouble(tempTokenCalcul->value)) isDouble=1;
+                    if (isTokenDouble(tempTokenCalcul->value)) isDouble = 1;
                 }
                 tempTokenCalcul = tempTokenCalcul->nextToken;
             }
@@ -217,46 +192,17 @@ Var *addVariable(char *input, Var *headVar) {
             }
             strcpy(newVar->value, resultString);
         }
-    } else if (strcmp(getType(token->type), "QUOTES") == 0) {
+    } else if (strcmp(getType(token->type), "TOKENSTRING") == 0) {
         // Traitement des chaînes simples
         newVar->type = STRING;
-        token = token->nextToken;
-
-        char *longString = malloc(255);
-        if (longString == NULL) {
-            printf("Erreur d'allocation mémoire\n");
-            freeVariable(newVar);
-            freeVariable(headVar);
-            exit(1);
-        }
-        longString[0] = '\0';
-        int countForSpace = 0;
-
-        while (token != NULL && strcmp(getType(token->type), "QUOTES") != 0) {
-            if (countForSpace % 2 == 1) strcat(longString, " ");
-            strncat(longString, token->value, 255 - strlen(longString));
-            token = token->nextToken;
-            countForSpace++;
-        }
-
-        if (token == NULL) {
-            printf("Erreur : guillemet fermante manquant\n");
-            free(longString);
-            freeVariable(newVar);
-            freeVariable(headVar);
-            exit(1);
-        }
-
-        newVar->value = malloc(strlen(longString) + 1);
+        newVar->value = malloc(strlen(token->value) + 1);
         if (newVar->value == NULL) {
             printf("Erreur d'allocation mémoire\n");
-            free(longString);
             freeVariable(newVar);
             freeVariable(headVar);
             exit(1);
         }
-        strcpy(newVar->value, longString);
-        free(longString);
+        strcpy(newVar->value, token->value);
     } else if (strcmp(getType(token->type), "NUMBER") == 0) {
         // Traitement des nombres
         if (isTokenDouble(token->value)) {
@@ -282,11 +228,10 @@ Var *addVariable(char *input, Var *headVar) {
         }
     }
 
-    if (newVar != NULL) {
+    if (newVar != NULL && isVarExist == 0) {
         newVar->nextVar = headVar;
         headVar = newVar;
     }
-
     return headVar;
 }
 
@@ -305,7 +250,7 @@ Var *getVariable(Var *var, char *searchedVar) {
 
 // printVariables
 void printVariables(Var *var) {
-    if(var->nextVar!=NULL) printVariables(var->nextVar);
+    if (var->nextVar != NULL) printVariables(var->nextVar);
     printf("%s %s %s\n", getVarType(var->type), var->name, var->value);
 }
 

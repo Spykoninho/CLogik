@@ -48,12 +48,12 @@ Token *lexer(char *string, Token *token) {
                 break;
             case '=':
                 token = addToken(token, ASSIGN, stringValue);
-            break;
+                break;
         }
         // rajouter les < > & | = ! % >= <= == !=
         if (*string >= '0' && *string <= '9') {
             char numberString[255] = "";
-            while (*string >= '0' && *string <= '9'|| *string == '.') {
+            while (*string >= '0' && *string <= '9' || *string == '.') {
                 char NumberToString[2] = {*string, '\0'};
                 strcat(numberString, NumberToString);
                 *string++;
@@ -62,7 +62,7 @@ Token *lexer(char *string, Token *token) {
             continue;
         }
 
-        if(*string == '"') {
+        if (*string == '"') {
             *string++;
             char longString[255] = "";
             while (*string != '"' && *string != '\0') {
@@ -70,7 +70,7 @@ Token *lexer(char *string, Token *token) {
                 strcat(longString, charToString);
                 string++;
             }
-            if(*string == '\0') {
+            if (*string == '\0') {
                 printf("Error lexer : il manque une \"");
                 exit(1);
             }
@@ -81,7 +81,8 @@ Token *lexer(char *string, Token *token) {
 
         if (*string >= 'a' && *string <= 'z' || *string >= 'A' && *string <= 'Z') {
             char longString[255] = "";
-            while (*string >= 'a' && *string <= 'z' || *string >= 'A' && *string <= 'Z' || *string >= '0' && *string <= '9') {
+            while (*string >= 'a' && *string <= 'z' || *string >= 'A' && *string <= 'Z' || *string >= '0' && *string <=
+                   '9') {
                 char charToString[2] = {*string, '\0'};
                 strcat(longString, charToString);
                 *string++;
@@ -141,8 +142,6 @@ char *getType(int type) {
             return "SEMICOLON";
         case ASSIGN:
             return "ASSIGN";
-        case QUOTES:
-            return "QUOTES";
         case DOT:
             return "DOT";
         default:
