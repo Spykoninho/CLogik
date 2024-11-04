@@ -18,7 +18,10 @@ void parser(char *input) {
     Token *inputToken = NULL;
     inputToken = lexer(input, inputToken);
 
-    exit(isValidToParse(inputToken));
+    int error = 0;
+    int ok = isValidToParse(inputToken, &error);
+    printReturn(ok, error);
+    exit(0);
     // Si il y a bien des instructions
     if (inputToken != NULL) {
         // on copie le resultat de la fonction qui permet de l'avoir dans notre string
