@@ -20,7 +20,8 @@ int main(void) {
     variable = addVariable("c=12.3", variable);
     variable = addVariable("d=a*2+a", variable);
 
-    parser("print(a)");
+    parser("print(2*(4.5+2)*3)");
+    parser("print(d)");
     printf("3: %p\n", variable);
     printVariables(variable);
     freeVariable(variable);
