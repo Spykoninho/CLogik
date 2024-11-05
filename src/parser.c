@@ -23,10 +23,11 @@ void parser(char *input) {
     if (inputToken != NULL) {
         if (inputToken->type == PRINT) {
             parserPrint(inputToken);
+        } else {
+            // on copie le resultat de la fonction qui permet de l'avoir dans notre string
+            double result = calcul(inputToken);
+            printf("Result : %lf\n", result);
         }
-        // on copie le resultat de la fonction qui permet de l'avoir dans notre string
-        double result = calcul(inputToken);
-        printf("Result : %lf\n", result);
 
         // On free tout
         freeToken(inputToken);
