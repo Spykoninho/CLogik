@@ -51,7 +51,7 @@ Token *lexer(char *string, Token *token) {
                 break;
             case '=':
                 if (*(string + 1) == '=') {
-                    token = addToken(token, EQUAL, ">=");
+                    token = addToken(token, EQUAL, "==");
                     string++;
                 } else {
                     token = addToken(token, ASSIGN, stringValue);

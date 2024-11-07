@@ -8,7 +8,7 @@
 
 Token *handleStatements(Token *TokenList, int * error);
 Token *handleStatement(Token *TokenList, int * error);
-Token*  handleFirstToken(Token *firstToken, int * error);
+Token* handleExpression(Token *firstToken, int * error);
 Token *handleStatementRest(Token *TokenList, int * error);
 int isValidToParse(Token *TokenList, int* error);
 int matchType(Type actualType, Type expectedType);
@@ -17,4 +17,12 @@ int isNumber(Type actualChar);
 int isVariable(Type actualChar);
 Token* operation(Token * TokenList, int* error);
 void printReturn(int ok, int error);
+
+
+Token *handleElement(Token *token, int *error);
+Token* handleRestTerm(Token* token, int* error);
+Token* handleTerm(Token* token, int* error);
+Token * startHandling(Token*  token, int* error);
+int nextTokenIsParenthesis(Token* token);
+
 #endif //VALIDATOR_H

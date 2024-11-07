@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include "../headers/validator.h"
 
+#include <string.h>
+
 #include "../headers/lexer.h"
 
 int isValidToParse(Token *TokenList, int *error) {
@@ -15,7 +17,8 @@ int isValidToParse(Token *TokenList, int *error) {
         return 0;
     }
     printTokens(TokenList);
-    const Token *finalToken = handleStatements(TokenList, error); // On check la liste de tokens
+    // const Token *finalToken = handleStatements(TokenList, error); // On check la liste de tokens
+    const Token *finalToken = startHandling(TokenList, error); // On check la liste de tokens
     if (finalToken == NULL) {
         // Si la chaine s'est terminée trop tôt (qu'on a consommé tous les tokens, c'est pas valide)
         if (!*error) {
@@ -26,7 +29,7 @@ int isValidToParse(Token *TokenList, int *error) {
     return matchType(finalToken->type, SEMICOLON); // Si on a bien un point virgule à la fin, c'est valide
 }
 
-Token *handleStatements(Token *TokenList, int *error) {
+/*Token *handleStatements(Token *TokenList, int *error) {
     Token *newToken = handleStatement(TokenList, error); // On check le premier statement
     if (newToken == NULL) {
         return NULL;
@@ -45,55 +48,109 @@ Token *handleStatement(Token *TokenList, int *error) {
     if (*error || TokenList == NULL) {
         return NULL;
     }
-    TokenList =next(TokenList);
+    TokenList = next(TokenList);
     return handleStatementRest(TokenList, error);
+}*/
+
+Token * startHandling(Token*  token, int* error) {
+
+    Token *finalToken = handleExpression(token, error);
+    if (*error) {
+        return NULL;
+    }
+    int ok = matchType(finalToken->type, SEMICOLON);
+    if (!ok) {
+        *error = 7;
+    }
+    if (!*error && finalToken->nextToken != NULL) {
+        return startHandling(finalToken->nextToken, error);
+    }
+    if (*error) {
+        return NULL;
+    }
+    return finalToken;
+
 }
 
-Token* handleFirstToken(Token *firstToken, int *error) {
-    Type tokenType = firstToken->type;
-    if (!matchType(tokenType, LPAREN)) { //TODO : gérer les parenthèses
-        int firstTokenIsVariable = isVariable(tokenType); //TODO : rajouter les autres cas ici s'il y en a
-        int firstTokenIsFunction = matchType(tokenType, 999999); //FUNCTION
-        int firstTokenIsNumber = isNumber(tokenType);
-        int firstTokenIsKeyWord = matchType(tokenType, KEYWORD);
-        if (!firstTokenIsVariable && !firstTokenIsFunction && !firstTokenIsNumber && !firstTokenIsKeyWord) {
-            *error = 1;
-        }
-    } else {
-        firstToken = next(firstToken);
-        handleFirstToken(firstToken, error);
+Token *handleElement(Token *token, int *error) {
+    if (strcmp(token->value, "(") == 0) {
+        matchType(token->type, LPAREN);
+        Token *newToken = next(token);
+        newToken = handleExpression(newToken, error);
         if (*error) {
             return NULL;
         }
-        firstToken = next(firstToken);
-        if (!matchType(firstToken->type, RPAREN)) { //TODO : gérer les parenthèses
-            *error = 56923;
+        int ok= matchType(newToken->type, RPAREN);
+        if (!ok) {
+             *error =6;
+        }
+    } else {
+        Type tokenType = token->type;
+        int firstTokenIsVariable = isVariable(tokenType);
+        int firstTokenIsNumber = isNumber(tokenType);
+        if (!firstTokenIsVariable && !firstTokenIsNumber && !nextTokenIsParenthesis(token)) {
+            *error = 1;
         }
     }
-    return firstToken;
+    return next(token);
+}
+int nextTokenIsParenthesis(Token* token) {
+    return matchType(token->nextToken->type, RPAREN);
+}
+Token *handleExpression(Token *firstToken, int *error) {
+    Token* token = handleTerm(firstToken, error);
+    if (*error) {
+        return NULL;
+    }
+    token = handleRestTerm(token, error);
+    return token;
+}
+
+Token* handleTerm(Token* token, int* error) {
+    Token* newToken = handleElement(token, error);
+    if (*error) {
+        return NULL;
+    }
+    newToken = handleRestTerm(newToken, error);
+    return newToken;
+}
+
+Token* handleRestTerm(Token* token, int* error) {
+    Type tokenType = token->type;
+    int isOp = isOperator(tokenType);
+    if (isOp) {
+        Token *newToken = next(token);
+        newToken= handleElement(newToken, error);
+        if (*error) {
+            return NULL;
+        }
+        newToken = handleRestTerm(newToken, error);
+        token = newToken;
+    }
+    return token;
 }
 
 Token *handleStatementRest(Token *TokenList, int *error) {
     //TODO : refactoriser le code pour la répétition
     Type tokenType = TokenList->type;
-    int ok = matchType(tokenType, IDENTIFIER); //TODO : rajouter les autres cas ici
-    if (!ok) {
-        exit(852);
+    int isAssignation = matchType(tokenType, ASSIGN);
+    if (isAssignation) {
+        TokenList = next(TokenList); // Si c'est bon, on passe au token suivant
+        tokenType = TokenList->type;
+        int assigningNum = isNumber(tokenType);
+        int tokenIsVariable = matchType(tokenType, IDENTIFIER);
+        if (!assigningNum && !tokenIsVariable) {
+            *error = 2;
+            return NULL;
+        }
+        int varExists = 1; //TODO : check si la variable a été déclarée (isVarExists)
+        if (!varExists) {
+            *error = 3;
+            return NULL;
+        }
+        TokenList = next(TokenList); // Si c'est bon, on passe au token suivant
     }
-    TokenList = next(TokenList); // Si c'est bon, on passe au token suivant
-    tokenType = TokenList->type;
-    ok = matchType(tokenType, ASSIGN);
-    if (!ok) {
-        exit(2);
-    }
-    TokenList = next(TokenList);// Si c'est bon, on passe au token suivant
-    tokenType = TokenList->type;
-    ok = isNumber(tokenType);
-    if (!ok) {
-        exit(3);
-    }
-    TokenList = next(TokenList);// Si c'est bon, on passe au token suivant
-    TokenList= operation(TokenList);
+    TokenList = operation(TokenList, error);
     return TokenList;
 }
 
@@ -173,9 +230,14 @@ void printReturn(int ok, int error) {
             case 5:
                 printf("Erreur : Caractère inconnu apres un operateur");
                 break;
+            case 6:
+                printf("Erreur : Parenthese fermante non détectée");
+                break;
             default:
                 printf("Erreur : Erreur inconnue");
                 break;
         }
     }
 }
+
+
