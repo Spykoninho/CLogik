@@ -10,13 +10,7 @@
 #include "../headers/lexer.h"
 
 // addVariable
-Var *addVariable(char *input, Var *headVar) {
-    Token *token = NULL;
-
-    // Conversion de l'input en tokens
-    token = lexer(input, token);
-    printTokens(token);
-
+Var *addVariable(Token *token, Var *headVar) {
     if (token == NULL) {
         printf("Erreur dans la récupération des tokens\n");
         freeVariable(headVar);
@@ -45,7 +39,7 @@ Var *addVariable(char *input, Var *headVar) {
                 printf("Erreur d'allocation en mémoire pour le nom de la variable\n");
                 free(newVar);
                 freeVariable(headVar);
-                return headVar;
+                exit(1);
             }
 
             strcpy(newVar->name, token->value);
@@ -191,6 +185,7 @@ Var *addVariable(char *input, Var *headVar) {
                 exit(1);
             }
             strcpy(newVar->value, resultString);
+            return headVar;
         }
     } else if (strcmp(getType(token->type), "TOKENSTRING") == 0) {
         // Traitement des chaînes simples
@@ -231,8 +226,9 @@ Var *addVariable(char *input, Var *headVar) {
     if (newVar != NULL && isVarExist == 0) {
         newVar->nextVar = headVar;
         headVar = newVar;
+        return headVar;
     }
-    return headVar;
+    return newVar;
 }
 
 // getVariable
@@ -250,6 +246,10 @@ Var *getVariable(Var *var, char *searchedVar) {
 
 // printVariables
 void printVariables(Var *var) {
+    if(var == NULL) {
+        printf("Aucune variable n'est enregistree");
+        return;
+    }
     if (var->nextVar != NULL) printVariables(var->nextVar);
     printf("%s %s %s\n", getVarType(var->type), var->name, var->value);
 }

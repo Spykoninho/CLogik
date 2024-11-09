@@ -122,7 +122,6 @@ Token *tokensToShuttingYardLinkedList(Token *tokens) {
 
 double calcul(Token *token) {
     Token *stToken = tokensToShuttingYardLinkedList(token);
-    printTokens(stToken);
     Token *stTokenPile = NULL;
     Token *actualStToken = stToken;
     double result = 0;
