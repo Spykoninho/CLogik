@@ -32,7 +32,7 @@ typedef enum inputType {
     ASSIGN, // =
     DOT, // .
     PRINT, // print
-    UNKNOWN = -1      // quand le lexer sait pas ou que c'est pas encore implémenté
+    UNKNOWN = -1 // quand le lexer sait pas ou que c'est pas encore implémenté
 } Type;
 
 void parser(char *input);

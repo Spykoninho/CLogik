@@ -32,7 +32,7 @@ void parserPrint(Token *token) {
         return;
     }
 
-    if(token->type == IDENTIFIER) {
+    if (token->type == IDENTIFIER) {
         Var *var = getVariable(variable, token->value);
 
         if (var == NULL) {

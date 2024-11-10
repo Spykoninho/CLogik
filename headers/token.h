@@ -19,11 +19,11 @@ void freeTokens(Token *);
 
 void freeToken(Token *);
 
-void printTokens(Token * tokens);
+void printTokens(Token *tokens);
 
-void printToken(Token * token);
+void printToken(Token *token);
 
-Token * tokensToShuttingYardLinkedList(Token *);
+Token *tokensToShuttingYardLinkedList(Token *);
 
 int isBufferOperatorPriority(Type bufferType, Type operatorType);
 
@@ -31,7 +31,7 @@ int checkOperatorPriority(Type type);
 
 int isOperator(Type type);
 
-double calcul(Token * stToken);
+double calcul(Token *stToken);
 
 Token *popBufferToken(Token *head);
 

@@ -4,9 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "../headers/variable.h"
-
 #include <string.h>
-
 #include "../headers/lexer.h"
 
 // Ajouter une variable dans la liste headVar qui contient toutes les variables
@@ -204,21 +202,21 @@ Var *addVariable(Token *token, Var *headVar) {
             }
             strcpy(newVar->value, resultString);
         }
-    } else if(strcmp(getType(token->type), "IDENTIFIER") == 0) {
-        if(isVarExists(headVar, token->value)) {
+    } else if (strcmp(getType(token->type), "IDENTIFIER") == 0) {
+        if (isVarExists(headVar, token->value)) {
             // on vérifie que l'utilisateur ne fait pas de a=a par exemple
-            if(strcmp(token->value, newVar->name) == 0) return headVar;
+            if (strcmp(token->value, newVar->name) == 0) return headVar;
 
             Var *var = getVariable(headVar, token->value);
             newVar->type = var->type;
             newVar->value = malloc(strlen(var->value) + 1);
             strcpy(newVar->value, var->value);
-        }else{
+        } else {
             printf("Erreur : la variable n'existe pas\n");
             freeVariable(headVar);
             exit(1);
         }
-    }else if (strcmp(getType(token->type), "TOKENSTRING") == 0) {
+    } else if (strcmp(getType(token->type), "TOKENSTRING") == 0) {
         // Traitement des chaînes simples
         newVar->type = STRING;
         newVar->value = malloc(strlen(token->value) + 1);
@@ -277,7 +275,7 @@ Var *getVariable(Var *var, char *searchedVar) {
 
 // printVariables
 void printVariables(Var *var) {
-    if(var == NULL) {
+    if (var == NULL) {
         printf("Aucune variable n'est enregistree");
         return;
     }

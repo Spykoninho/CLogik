@@ -14,4 +14,6 @@ add_executable(CLogik src/main.c
         headers/variable.h
         src/interpret.c
         headers/interpret.h
+        src/print.c
+        src/variablesList.c
 )

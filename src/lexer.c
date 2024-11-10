@@ -53,7 +53,7 @@ Token *lexer(char *string, Token *token) {
                 } else {
                     token = addToken(token, ASSIGN, stringValue);
                 }
-            break;
+                break;
             case '>':
                 if (*(string + 1) == '=') {
                     token = addToken(token, GREATEREQ, ">=");
@@ -117,7 +117,7 @@ Token *lexer(char *string, Token *token) {
             if (strcmp(longString, "print") == 0) {
                 token = addToken(token, PRINT, longString);
                 continue;
-            } else {                
+            } else {
                 token = addToken(token, IDENTIFIER, longString);
                 continue;
             }

@@ -14,7 +14,7 @@ int main(void) {
     do {
         fgets(input, 100, stdin);
         interpret(input, &variables);
-    }while (strcmp(input, "q") != 0);
+    } while (strcmp(input, "q") != 0);
 
     freeVariable(variables);
     return 0;
