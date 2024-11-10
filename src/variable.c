@@ -9,24 +9,27 @@
 
 #include "../headers/lexer.h"
 
-// addVariable
+// Ajouter une variable dans la liste headVar qui contient toutes les variables
 Var *addVariable(Token *token, Var *headVar) {
+    // On vérifie que le lexer a bien renvoyé des tokens
     if (token == NULL) {
         printf("Erreur dans la récupération des tokens\n");
         freeVariable(headVar);
         exit(1);
     }
 
+    // On initialise la nouvelle variable
     Var *newVar = NULL;
     int isVarExist = 0;
 
     // Assignation du nom de la variable
     if (strcmp(getType(token->type), "IDENTIFIER") == 0) {
+        // Si la variable appelée existe, newVar devient la variable
         if (isVarExists(headVar, token->value)) {
             newVar = getVariable(headVar, token->value);
             isVarExist = 1;
         } else {
-            // Initialisation de la variable
+            // Allocation de la mémoire pour la nouvelle variable
             newVar = malloc(sizeof(Var));
             if (newVar == NULL) {
                 printf("Erreur d'allocation en mémoire pour la variable\n");
@@ -42,8 +45,10 @@ Var *addVariable(Token *token, Var *headVar) {
                 exit(1);
             }
 
+            // On met le premier token comme nom de la variable
             strcpy(newVar->name, token->value);
         }
+        // On passe au =
         token = token->nextToken;
     } else {
         printf("Erreur : format incorrect pour l'initialisation de la variable\n");
@@ -59,6 +64,8 @@ Var *addVariable(Token *token, Var *headVar) {
         freeVariable(headVar);
         exit(1);
     }
+
+    // On passe à la valeur de la variable (calcul, string, nombre ou variable)
     token = token->nextToken;
 
     // Vérification s'il y a un calcul ou une simple assignation
@@ -70,10 +77,12 @@ Var *addVariable(Token *token, Var *headVar) {
         if (isOperator(temp->type)) isCalcul = 1;
         temp = temp->nextToken;
     }
+    freeTokens(temp);
 
+    // Si on détecte des opérateurs on déclenche le calcul
     if (isCalcul) {
+        // on verif si il y a une variable qui est une string
         int isVarString = 0;
-        // on verif si c'est une variable qui est une string
         if (strcmp(getType(token->type), "IDENTIFIER") == 0) {
             if (isVarExists(headVar, token->value)) {
                 Var *checkVar = getVariable(headVar, token->value);
@@ -85,6 +94,7 @@ Var *addVariable(Token *token, Var *headVar) {
                 exit(1);
             }
         }
+
         // Traitement des chaînes de caractères
         if (strcmp(getType(token->type), "TOKENSTRING") == 0 || isVarString) {
             newVar->type = STRING;
@@ -143,15 +153,23 @@ Var *addVariable(Token *token, Var *headVar) {
             strcpy(newVar->value, longString);
             free(longString);
         } else {
-            // Traitement des calculs
+            // Traitement des calculs avec des nombres
             Token *tempTokenCalcul = token;
             int isDouble = 0;
             while (tempTokenCalcul != NULL) {
                 if (strcmp(getType(tempTokenCalcul->type), "IDENTIFIER") == 0) {
                     if (isVarExists(headVar, tempTokenCalcul->value)) {
-                        Var *var = getVariable(headVar, tempTokenCalcul->value);
-                        tempTokenCalcul->value = realloc(tempTokenCalcul->value,
-                                                         sizeof(char) * (strlen(var->value) + 1));
+                        const Var *var = getVariable(headVar, tempTokenCalcul->value);
+                        // On prend le token de la variable et on regarde si c'est un double
+                        char *tempRealloc = realloc(tempTokenCalcul->value, sizeof(char) * (strlen(var->value) + 1));
+                        if (tempRealloc == NULL) {
+                            printf("Erreur de réallocation de mémoire pour tempTokenCalcul->value\n");
+                            freeVariable(headVar);
+                            freeTokens(token);
+                            exit(1);
+                        }
+                        // nouvelle taille pour la value
+                        tempTokenCalcul->value = tempRealloc;
                         strcpy(tempTokenCalcul->value, var->value);
                         if (isTokenDouble(var->value)) {
                             isDouble = 1;
@@ -185,9 +203,22 @@ Var *addVariable(Token *token, Var *headVar) {
                 exit(1);
             }
             strcpy(newVar->value, resultString);
-            return headVar;
         }
-    } else if (strcmp(getType(token->type), "TOKENSTRING") == 0) {
+    } else if(strcmp(getType(token->type), "IDENTIFIER") == 0) {
+        if(isVarExists(headVar, token->value)) {
+            // on vérifie que l'utilisateur ne fait pas de a=a par exemple
+            if(strcmp(token->value, newVar->name) == 0) return headVar;
+
+            Var *var = getVariable(headVar, token->value);
+            newVar->type = var->type;
+            newVar->value = malloc(strlen(var->value) + 1);
+            strcpy(newVar->value, var->value);
+        }else{
+            printf("Erreur : la variable n'existe pas\n");
+            freeVariable(headVar);
+            exit(1);
+        }
+    }else if (strcmp(getType(token->type), "TOKENSTRING") == 0) {
         // Traitement des chaînes simples
         newVar->type = STRING;
         newVar->value = malloc(strlen(token->value) + 1);
@@ -223,12 +254,12 @@ Var *addVariable(Token *token, Var *headVar) {
         }
     }
 
-    if (newVar != NULL && isVarExist == 0) {
-        newVar->nextVar = headVar;
-        headVar = newVar;
+    if (isVarExist == 1) {
         return headVar;
     }
-    return newVar;
+    newVar->nextVar = headVar;
+    headVar = newVar;
+    return headVar;
 }
 
 // getVariable
