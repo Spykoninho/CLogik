@@ -17,8 +17,6 @@ void parser(char *input) {
     // crée la suite de token en fonction de l'input
     Token *inputToken = NULL;
     inputToken = lexer(input, inputToken);
-    printf("Tokens : \n");
-    printToken(inputToken);
     // Si il y a bien des instructions
     if (inputToken != NULL) {
         switch (inputToken->type) {

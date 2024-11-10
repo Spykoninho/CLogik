@@ -3,6 +3,9 @@
 #include "../headers/variable.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
+#include "../headers/lexer.h"
 
 /**
  * @brief Print the result of the expression
@@ -10,12 +13,10 @@
  * @param token
  */
 void parserPrint(Token *token) {
-    double *responseDouble = NULL;
-    char *responseString = NULL;
-
+    // Check syntaxe print(args)
     if (token == NULL || token->type != PRINT) {
         printf("Error: print function not found\n");
-        printf("Token type : %d\n", token ? token->type : -1);
+        printf("Token type : %s\n", token ? getType(token->type) : "ERROR");
         return;
     }
 
@@ -31,18 +32,71 @@ void parserPrint(Token *token) {
         return;
     }
 
-    if (token->type == IDENTIFIER) {
-        Var *var = getVariable(variables, token->value);
+    int isCalcul = 0;
+    int isString = 0;
+    Token *temp = token;
+    while (temp != NULL) {
+        if (temp->type == STRING) isString++;
+        if (isOperator(temp->type)) isCalcul = 1;
+        temp = temp->nextToken;
+    }
+    freeTokens(temp);
 
-        if (var == NULL) {
-            printf("Error: variable %s not found\n", token->value);
-            return;
+    if (isCalcul) {
+        int isVarString = 0;
+        if (token->type == IDENTIFIER) {
+            if (isVarExists(variables, token->value)) {
+                Var *checkVar = getVariable(variables, token->value);
+                if (checkVar->type == STRING) isVarString = 1;
+            } else {
+                printf("Erreur : La variable n'existe pas\n");
+                exit(1);
+            }
         }
 
-        printf("Result Print: %s\n", var->value);
-    } else {
-        responseDouble = malloc(sizeof(double));
-        *responseDouble = calcul(token);
-        printf("Result Print: %g\n", *responseDouble);
+        if (token->type == TOKENSTRING || isVarString) {
+            char *printedString = malloc(255 * sizeof(char));
+            if (printedString == NULL) {
+                printf("Erreur d'allocation de memoire\n");
+                return;
+            }
+            printedString[0] = '\0';
+
+            if (isVarString) {
+                Var *var = getVariable(variables, token->value);
+                strncat(printedString, var->value, 255 - strlen(printedString));
+            } else {
+                strncat(printedString, token->value, 255 - strlen(printedString));
+            }
+            token = token->nextToken;
+
+            // Traitement des concaténations
+            while (token != NULL && token->type == PLUS) {
+                token = token->nextToken; // Sauter le '+'
+
+                if (token->type == TOKENSTRING) {
+                    strncat(printedString, token->value, 255 - strlen(printedString));
+                } else if (token->type == IDENTIFIER) {
+                    Var *var = getVariable(variables, token->value);
+                    if (var->type != STRING) {
+                        printf("Erreur : la concatenation doit etre avec une chaine de caracteres\n");
+                        return;
+                    }
+                    strncat(printedString, var->value, 255 - strlen(printedString));
+                } else {
+                    printf("Erreur : concatenation invalide\n");
+                    return;
+                }
+                token = token->nextToken;
+            }
+            printf("%s\n", printedString);
+            free(printedString);
+            return;
+        }
     }
+    if (token == NULL || token->type != RPAREN) {
+        printf("Error: missing ')' after print\n");
+        return;
+    }
+    printf("Result Print: %g\n", calcul(token));
 }

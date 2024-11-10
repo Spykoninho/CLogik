@@ -21,7 +21,7 @@ Var *addVariable(Token *token) {
     int isVarExist = 0;
 
     // Assignation du nom de la variable
-    if (strcmp(getType(token->type), "IDENTIFIER") == 0) {
+    if (token->type == IDENTIFIER) {
         // Si la variable appelée existe, newVar devient la variable
         if (isVarExists(variables, token->value)) {
             newVar = getVariable(variables, token->value);
@@ -56,7 +56,7 @@ Var *addVariable(Token *token) {
     }
 
     // Vérification de l'opérateur '='
-    if (strcmp(getType(token->type), "ASSIGN") != 0) {
+    if (token->type != ASSIGN) {
         printf("Erreur : format incorrect, attendu '=' pour l'assignation\n");
         freeVariable(newVar);
         freeVariable(variables);
@@ -71,7 +71,7 @@ Var *addVariable(Token *token) {
     int isString = 0;
     Token *temp = token;
     while (temp != NULL) {
-        if (strcmp(getType(temp->type), "TOKENSTRING") == 0) isString++;
+        if (temp->type == TOKENSTRING) isString++;
         if (isOperator(temp->type)) isCalcul = 1;
         temp = temp->nextToken;
     }
@@ -81,10 +81,10 @@ Var *addVariable(Token *token) {
     if (isCalcul) {
         // on verif si il y a une variable qui est une string
         int isVarString = 0;
-        if (strcmp(getType(token->type), "IDENTIFIER") == 0) {
+        if (token->type == IDENTIFIER) {
             if (isVarExists(variables, token->value)) {
                 Var *checkVar = getVariable(variables, token->value);
-                if (strcmp(getVarType(checkVar->type), "STRING") == 0) isVarString = 1;
+                if (checkVar->type == STRING) isVarString = 1;
             } else {
                 printf("Erreur : La variable n'existe pas\n");
                 freeVariable(variables);
@@ -94,7 +94,7 @@ Var *addVariable(Token *token) {
         }
 
         // Traitement des chaînes de caractères
-        if (strcmp(getType(token->type), "TOKENSTRING") == 0 || isVarString) {
+        if (token->type == TOKENSTRING || isVarString) {
             newVar->type = STRING;
 
             char *longString = malloc(255 * sizeof(char));
@@ -115,15 +115,15 @@ Var *addVariable(Token *token) {
             token = token->nextToken;
 
             // Traitement des concaténations
-            while (token != NULL && strcmp(getType(token->type), "PLUS") == 0) {
+            while (token != NULL && token->type == PLUS) {
                 token = token->nextToken; // Sauter le '+'
 
-                if (strcmp(getType(token->type), "TOKENSTRING") == 0) {
+                if (token->type == TOKENSTRING) {
                     strncat(longString, token->value, 255 - strlen(longString));
-                } else if (strcmp(getType(token->type), "IDENTIFIER") == 0) {
-                    Var *var = getVariable(variables, token->value);
-                    if (strcmp(getVarType(var->type), "STRING") != 0) {
-                        printf("Erreur : la concatenation doit être avec une chaîne de caractères\n");
+                } else if (token->type == IDENTIFIER) {
+                    const Var *var = getVariable(variables, token->value);
+                    if (var->type != STRING) {
+                        printf("Erreur : la concatenation doit etre avec une chaine de caracteres\n");
                         free(longString);
                         freeVariable(newVar);
                         freeVariable(variables);
@@ -155,13 +155,13 @@ Var *addVariable(Token *token) {
             Token *tempTokenCalcul = token;
             int isDouble = 0;
             while (tempTokenCalcul != NULL) {
-                if (strcmp(getType(tempTokenCalcul->type), "IDENTIFIER") == 0) {
+                if (tempTokenCalcul->type == IDENTIFIER) {
                     if (isVarExists(variables, tempTokenCalcul->value)) {
                         const Var *var = getVariable(variables, tempTokenCalcul->value);
                         // On prend le token de la variable et on regarde si c'est un double
                         char *tempRealloc = realloc(tempTokenCalcul->value, sizeof(char) * (strlen(var->value) + 1));
                         if (tempRealloc == NULL) {
-                            printf("Erreur de réallocation de mémoire pour tempTokenCalcul->value\n");
+                            printf("Erreur de reallocation de memoire pour tempTokenCalcul->value\n");
                             freeVariable(variables);
                             freeTokens(token);
                             exit(1);
@@ -178,7 +178,7 @@ Var *addVariable(Token *token) {
                         freeVariable(variables);
                         exit(1);
                     }
-                } else if (strcmp(getType(tempTokenCalcul->type), "NUMBER") == 0) {
+                } else if (tempTokenCalcul->type == NUMBER) {
                     if (isTokenDouble(tempTokenCalcul->value)) isDouble = 1;
                 }
                 tempTokenCalcul = tempTokenCalcul->nextToken;
@@ -195,14 +195,14 @@ Var *addVariable(Token *token) {
 
             newVar->value = malloc(strlen(resultString) + 1);
             if (newVar->value == NULL) {
-                printf("Erreur d'allocation mémoire\n");
+                printf("Erreur d'allocation memoire\n");
                 freeVariable(newVar);
                 freeVariable(variables);
                 exit(1);
             }
             strcpy(newVar->value, resultString);
         }
-    } else if (strcmp(getType(token->type), "IDENTIFIER") == 0) {
+    } else if (token->type == IDENTIFIER) {
         if (isVarExists(variables, token->value)) {
             // on vérifie que l'utilisateur ne fait pas de a=a par exemple
             if (strcmp(token->value, newVar->name) == 0) return variables;
@@ -216,7 +216,7 @@ Var *addVariable(Token *token) {
             freeVariable(variables);
             exit(1);
         }
-    } else if (strcmp(getType(token->type), "TOKENSTRING") == 0) {
+    } else if (token->type == TOKENSTRING) {
         // Traitement des chaînes simples
         newVar->type = STRING;
         newVar->value = malloc(strlen(token->value) + 1);
@@ -227,7 +227,7 @@ Var *addVariable(Token *token) {
             exit(1);
         }
         strcpy(newVar->value, token->value);
-    } else if (strcmp(getType(token->type), "NUMBER") == 0) {
+    } else if (token->type == NUMBER) {
         // Traitement des nombres
         if (isTokenDouble(token->value)) {
             newVar->type = DOUBLE;

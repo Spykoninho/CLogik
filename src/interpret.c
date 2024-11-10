@@ -14,11 +14,11 @@ void interpret(char *input) {
     Token *token = NULL;
     token = lexer(input, token);
     while (token->nextToken != NULL) {
-        if (strcmp(getType(token->type), "PRINT") == 0) {
+        if (token->type == PRINT) {
             parserPrint(token);
-        } else if (strcmp(getType(token->type), "IDENTIFIER") == 0) {
+        } else if (token->type == IDENTIFIER) {
             const Token *tempToken = token->nextToken;
-            if (strcmp(getType(tempToken->type), "ASSIGN") == 0) {
+            if (tempToken->type == ASSIGN) {
                 addVariable(token);
                 printVariables(variables);
             }
