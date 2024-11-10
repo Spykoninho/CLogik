@@ -114,12 +114,13 @@ Token *lexer(char *string, Token *token) {
                 strcat(longString, charToString);
                 *string++;
             }
-            if(strcmp(longString, "print") == 0) {
-                token = addToken(token, FUNCTION, longString);
-            }else {
+            if (strcmp(longString, "print") == 0) {
+                token = addToken(token, PRINT, longString);
+                continue;
+            } else {                
                 token = addToken(token, IDENTIFIER, longString);
+                continue;
             }
-            continue;
         }
         string++;
     }
@@ -177,8 +178,8 @@ char *getType(int type) {
             return "ASSIGN";
         case DOT:
             return "DOT";
-        case FUNCTION:
-            return "FUNCTION";
+        case PRINT:
+            return "PRINT";
         default:
             return "UNKNOWN";
     }

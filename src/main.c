@@ -5,6 +5,8 @@
 #include "../headers/interpret.h"
 #include "../headers/variable.h"
 
+extern Var *variable;
+
 int main(void) {
     char input[100];
     Var *variables = NULL;

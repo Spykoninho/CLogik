@@ -53,3 +53,11 @@ dkms.conf
 
 /cmake-build-debug
 /cmake-build-debug-mingw
+
+# Editors
+
+.vscode/
+.idea/
+*.swp
+*~
+*.bak
