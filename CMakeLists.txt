@@ -5,10 +5,15 @@ set(CMAKE_C_STANDARD 11)
 
 add_executable(CLogik src/main.c
         src/lexer.c
+        src/variablesList.c
         headers/token.h
         src/token.c
         headers/lexer.h
         src/parser.c
         headers/parser.h
         src/variable.c
-        headers/variable.h)
+        headers/variable.h
+        src/interpret.c
+        headers/interpret.h
+        src/print.c
+)

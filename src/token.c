@@ -80,15 +80,15 @@ Token *tokensToShuttingYardLinkedList(Token *tokens) {
     Token *output = NULL;
     while (tokens != NULL) {
         // Si la valeur est un nombre on le met directement dans l'output
-        if (strcmp(getType(tokens->type), "NUMBER") == 0) {
+        if (tokens->type == NUMBER) {
             output = addToken(output, tokens->type, tokens->value);
         }
 
-        if (strcmp(getType(tokens->type), "LPAREN") == 0) {
+        if (tokens->type == LPAREN) {
             buffer = addBufferToken(buffer, tokens->type, tokens->value);
         }
 
-        if (strcmp(getType(tokens->type), "RPAREN") == 0) {
+        if (tokens->type == RPAREN) {
             while (buffer != NULL && strcmp(buffer->value, "(") != 0) {
                 output = addToken(output, buffer->type, buffer->value);
                 buffer = popBufferToken(buffer);
@@ -122,7 +122,6 @@ Token *tokensToShuttingYardLinkedList(Token *tokens) {
 
 double calcul(Token *token) {
     Token *stToken = tokensToShuttingYardLinkedList(token);
-    printTokens(stToken);
     Token *stTokenPile = NULL;
     Token *actualStToken = stToken;
     double result = 0;

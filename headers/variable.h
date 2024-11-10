@@ -5,32 +5,35 @@
 #ifndef VARIABLE_H
 #define VARIABLE_H
 #include "token.h"
+
 typedef enum {
     STRING,
     INT,
     DOUBLE,
-}VarType;
+} VarType;
 
-typedef struct Variable{
+typedef struct Variable {
     VarType type;
-    char * name;
-    char * value;
-    struct Variable * nextVar;
-}Var;
+    char *name;
+    char *value;
+    struct Variable *nextVar;
+} Var;
 
-Var * addVariable(char * input, Var *headVar);
+extern Var* variables;
 
-void freeVariable(Var * variable);
+Var *addVariable(Token *input);
 
-Var * getVariable(Var *var, char *searchedVar);
+void freeVariable(Var *variable);
+
+Var *getVariable(Var *var, char *searchedVar);
 
 void printVariables(Var *var);
 
-char * getVarType(int type);
+char *getVarType(int type);
 
 int getListLength(Token *token);
 
 int isVarExists(Var *var, const char *searchedVar);
 
-int isTokenDouble(char * value);
+int isTokenDouble(char *value);
 #endif //VARIABLE_H
