@@ -54,6 +54,7 @@ void parserPrint(Token *token) {
             }
         }
 
+        // Print une concaténation de string
         if (token->type == TOKENSTRING || isVarString) {
             char *printedString = malloc(255 * sizeof(char));
             if (printedString == NULL) {
@@ -89,14 +90,82 @@ void parserPrint(Token *token) {
                 }
                 token = token->nextToken;
             }
+            if (token == NULL || token->type != RPAREN) {
+                printf("Error: missing ')' after print\n");
+                return;
+            }
             printf("%s\n", printedString);
             free(printedString);
             return;
+        }else{
+            // Traitement des calculs avec des nombres
+            Token *tempTokenCalcul = token;
+            while (tempTokenCalcul != NULL && tempTokenCalcul->type != RPAREN) {
+                if (tempTokenCalcul->type == IDENTIFIER) {
+                    if (isVarExists(variables, tempTokenCalcul->value)) {
+                        const Var *var = getVariable(variables, tempTokenCalcul->value);
+                        // On prend le token de la variable et on regarde si c'est un double
+                        char *tempRealloc = realloc(tempTokenCalcul->value, sizeof(char) * (strlen(var->value) + 1));
+                        if (tempRealloc == NULL) {
+                            printf("Erreur de reallocation de memoire pour tempTokenCalcul->value\n");
+                            freeVariable(variables);
+                            freeTokens(token);
+                            exit(1);
+                        }
+                        // nouvelle taille pour la value
+                        tempTokenCalcul->value = tempRealloc;
+                        strcpy(tempTokenCalcul->value, var->value);
+                        tempTokenCalcul->type = NUMBER;
+                    } else {
+                        printf("Erreur : variable '%s' inexistante\n", tempTokenCalcul->value);
+                        freeVariable(variables);
+                        exit(1);
+                    }
+                }
+                tempTokenCalcul = tempTokenCalcul->nextToken;
+            }
+            if (tempTokenCalcul == NULL || tempTokenCalcul->type != RPAREN) {
+                printf("Error: missing ')' after print\n");
+                return;
+            }
+            double result = calcul(token);
+            printf("Result Print: %g\n", result);
+            return;
         }
-    }
-    if (token == NULL || token->type != RPAREN) {
-        printf("Error: missing ')' after print\n");
+    }else if (token->type == IDENTIFIER) {
+        if (isVarExists(variables, token->value)) {
+            Var *var = getVariable(variables, token->value);
+            token = token->nextToken;
+            if (token == NULL || token->type != RPAREN) {
+                printf("Error: missing ')' after print\n");
+                return;
+            }
+            if(var->type == INT || var->type == DOUBLE) {
+                printf("Result Print: %g\n", var->value);
+            }else {
+                printf("Result Print: %s\n", var->value);
+            }
+        } else {
+            printf("Erreur : la variable n'existe pas\n");
+            return;
+        }
+    }else if (token->type == TOKENSTRING){
+        Token *tempToken = token->nextToken;
+        if (tempToken == NULL || tempToken->type != RPAREN) {
+            printf("Error: missing ')' after print\n");
+            return;
+        }
+        printf("Result Print: %s\n", token->value);
+        return;
+    }else if(token->type == NUMBER) {
+        Token *tempToken = token->nextToken;
+        if (tempToken == NULL || tempToken->type != RPAREN) {
+            printf("Error: missing ')' after print\n");
+            return;
+        }
+        printf("Result Print: %s\n", token->value);
         return;
     }
-    printf("Result Print: %g\n", calcul(token));
+
+    printf("Erreur : print non reconnu");
 }
