@@ -14,5 +14,6 @@ int main(void) {
         interpret(input, &variables);
     }while (strcmp(input, "q") != 0);
 
+    freeVariable(variables);
     return 0;
 }

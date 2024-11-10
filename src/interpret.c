@@ -31,4 +31,5 @@ void interpret(char * input, Var ** variables) {
 
         if(token->nextToken != NULL) token=token->nextToken;
     }
+    freeTokens(token);
 }
