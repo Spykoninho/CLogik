@@ -6,6 +6,6 @@
 #define INTERPRET_H
 #include "variable.h"
 
-void interpret(char *input, Var **variables);
+void interpret(char *input);
 
 #endif //INTERPRET_H

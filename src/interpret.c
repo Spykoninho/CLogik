@@ -10,7 +10,7 @@
 #include "../headers/token.h"
 #include "../headers/variable.h"
 
-void interpret(char *input, Var **variables) {
+void interpret(char *input) {
     Token *token = NULL;
     token = lexer(input, token);
     while (token->nextToken != NULL) {
@@ -19,8 +19,8 @@ void interpret(char *input, Var **variables) {
         } else if (strcmp(getType(token->type), "IDENTIFIER") == 0) {
             const Token *tempToken = token->nextToken;
             if (strcmp(getType(tempToken->type), "ASSIGN") == 0) {
-                *variables = addVariable(token, *variables);
-                printVariables(*variables);
+                addVariable(token);
+                printVariables(variables);
             }
         }
 

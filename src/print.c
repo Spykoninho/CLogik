@@ -12,7 +12,6 @@
 void parserPrint(Token *token) {
     double *responseDouble = NULL;
     char *responseString = NULL;
-    extern Var *variable;
 
     if (token == NULL || token->type != PRINT) {
         printf("Error: print function not found\n");
@@ -33,7 +32,7 @@ void parserPrint(Token *token) {
     }
 
     if (token->type == IDENTIFIER) {
-        Var *var = getVariable(variable, token->value);
+        Var *var = getVariable(variables, token->value);
 
         if (var == NULL) {
             printf("Error: variable %s not found\n", token->value);

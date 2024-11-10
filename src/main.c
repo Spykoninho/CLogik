@@ -9,11 +9,10 @@ extern Var *variable;
 
 int main(void) {
     char input[100];
-    Var *variables = NULL;
     printf("Entrez votre code : \n");
     do {
         fgets(input, 100, stdin);
-        interpret(input, &variables);
+        interpret(input);
     } while (strcmp(input, "q") != 0);
 
     freeVariable(variables);

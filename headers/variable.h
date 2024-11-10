@@ -19,7 +19,9 @@ typedef struct Variable {
     struct Variable *nextVar;
 } Var;
 
-Var *addVariable(Token *input, Var *headVar);
+extern Var* variables;
+
+Var *addVariable(Token *input);
 
 void freeVariable(Var *variable);
 
