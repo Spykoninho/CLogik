@@ -3,7 +3,6 @@
 //
 
 #include <stdio.h>
-#include <stdlib.h>
 #include "../headers/validator.h"
 
 #include <string.h>
@@ -116,10 +115,18 @@ Token* handleTerm(Token* token, int* error) {
 }
 
 Token* handleRestTerm(Token* token, int* error) {
+    if (token == NULL) {
+        *error = 7;
+        return NULL;
+    }
     Type tokenType = token->type;
     int isOp = isOperator(tokenType);
     if (isOp) {
         Token *newToken = next(token);
+        if (newToken == NULL) {
+            *error = 4;
+            return NULL;
+        }
         newToken= handleElement(newToken, error);
         if (*error) {
             return NULL;
@@ -213,6 +220,7 @@ void printReturn(int ok, int error) {
                 printf("Erreur : Chaine vide");
                 break;
             case -1:
+            case 7:
                 printf("Erreur : Chaine malformee");
                 break;
             case 1:
