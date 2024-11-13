@@ -10,25 +10,29 @@
 #include "../headers/print.h"
 
 void parser(Token *input) {
+    printTokens(input);
     while (input->nextToken != NULL) {
         if(input->type == UNKNOWN) error("unknown token");
 
         if(input->type == IDENTIFIER) {
-            nextToken(input);
+            input = nextToken(input);
             if(input->type != ASSIGN)
                 if(!isOperator(input->type)) error("Assignation ou calcul manquant");
-            nextToken(input);
+            input = nextToken(input);
 
-            checkCalcul(input);
-
+            input = checkCalcul(input);
+            break;
         }else if(input->type == FUNCTION) {
 
         }else if(input->type == NUMBER) {
 
+        }else if(input->type == IDENTIFIER) {
+            if(input->nextToken != NULL) error("Mauvais ordre");
         }else {
-            error("Mauvais ordre");
+            printf("error at : %s\n", input->value);
+            error("Mauvais ordre 2 :");
         }
-        input=input->nextToken;
+        input=nextToken(input);
     }
     if(strcmp(input->value, ";") != 0) error("; manquant");
 }
@@ -38,21 +42,27 @@ void error(char *msg) {
     exit(1);
 }
 
-void nextToken(Token *input) {
+Token * nextToken(Token *input) {
     input=input->nextToken;
     if(input == NULL) error("Ligne non finie correctement");
+    return input;
 }
 
-void checkCalcul(Token *input) {
-    Token *temp=input;
-    checkParentheses(temp);
-    if(input->type != IDENTIFIER && input->type != NUMBER) error("Mauvaise assignation dans checkCalcul");
-    nextToken(input);
-    while (input->nextToken != NULL && isOperator(input->type)) {
-        nextToken(input);
-        if(input->type != IDENTIFIER && input->type != NUMBER) error("Mauvaise assignation dans checkCalcul 2");
-        nextToken(input);
+Token * checkCalcul(Token *input) {
+    checkParentheses(input);
+    int modulo2 = 0;
+    while (input->nextToken != NULL) {
+        if(input->type == LPAREN || input->type == RPAREN) {
+            input=nextToken(input);
+            continue;
+        }
+        if(modulo2 % 2 == 0 && isOperator(input->type)) error("Operateur dans le mauvais ordre");
+        if(modulo2 % 2 == 1 && (input->type == IDENTIFIER || input->type == NUMBER)) error("Operandes dans le mauvais ordre");
+        if(input->type != IDENTIFIER && input->type != NUMBER && !isOperator(input->type)) error("Mauvais type de donnée dans le calcul");
+        input = nextToken(input);
+        modulo2++;
     }
+    return input;
 }
 
 void checkParentheses(Token *input) {
@@ -77,7 +87,7 @@ void checkParentheses(Token *input) {
             accoladeCheck--;
             error("Mauvaise gestion de accolade");
         }
-        input=input->nextToken;
+        input = nextToken(input);
     }
-    if(parentheseCheck != 0 || accoladeCheck != 0 || crochetCheck != 0) error("Mauvaise gestion des délimiteurs");
+    if(parentheseCheck != 0 || accoladeCheck != 0 || crochetCheck != 0) error("Mauvaise gestion des delimiteurs");
 }
