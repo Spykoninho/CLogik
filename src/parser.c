@@ -23,10 +23,10 @@ void parser(Token *input) {
             input = checkCalcul(input);
             break;
         }else if(input->type == FUNCTION) {
-
+            // verif syntaxe des fonctions, rajouter dans lexer du coup le type fonction puis adapter le code d'après, ici verif conditions et boucles
         }else if(input->type == NUMBER) {
-
-        }else if(input->type == IDENTIFIER) {
+            // verif quand on met un calcul random
+        }else if(input->type == SEMICOLON) {
             if(input->nextToken != NULL) error("Mauvais ordre");
         }else {
             printf("error at : %s\n", input->value);
