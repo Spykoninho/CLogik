@@ -89,5 +89,6 @@ void checkParentheses(Token *input) {
         }
         input = nextToken(input);
     }
+    if(strcmp(input->value, ";") != 0) error("; manquant");
     if(parentheseCheck != 0 || accoladeCheck != 0 || crochetCheck != 0) error("Mauvaise gestion des delimiteurs");
 }
