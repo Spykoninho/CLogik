@@ -9,28 +9,75 @@
 #include "../headers/lexer.h"
 #include "../headers/print.h"
 
-#define BUFFER_SIZE 1024
-#define SHUTTINGYARDSTRING_SIZE 1024
+void parser(Token *input) {
+    while (input->nextToken != NULL) {
+        if(input->type == UNKNOWN) error("unknown token");
 
-// Comprend le code pour l'éxecuter ensuite
-void parser(char *input) {
-    // crée la suite de token en fonction de l'input
-    Token *inputToken = NULL;
-    inputToken = lexer(input, inputToken);
-    // Si il y a bien des instructions
-    if (inputToken != NULL) {
-        switch (inputToken->type) {
-            case PRINT:
-                parserPrint(inputToken);
-                break;
-            default:
-                // on copie le resultat de la fonction qui permet de l'avoir dans notre string
-                double result = calcul(inputToken);
-                printf("Result : %lf\n", result);
-                break;
+        if(input->type == IDENTIFIER) {
+            nextToken(input);
+            if(input->type != ASSIGN)
+                if(!isOperator(input->type)) error("Assignation ou calcul manquant");
+            nextToken(input);
+
+            checkCalcul(input);
+
+        }else if(input->type == FUNCTION) {
+
+        }else if(input->type == NUMBER) {
+
+        }else {
+            error("Mauvais ordre");
+        }
+        input=input->nextToken;
+    }
+    if(strcmp(input->value, ";") != 0) error("; manquant");
+}
+
+void error(char *msg) {
+    printf("%s\n", msg);
+    exit(1);
+}
+
+void nextToken(Token *input) {
+    input=input->nextToken;
+    if(input == NULL) error("Ligne non finie correctement");
+}
+
+void checkCalcul(Token *input) {
+    Token *temp=input;
+    checkParentheses(temp);
+    if(input->type != IDENTIFIER && input->type != NUMBER) error("Mauvaise assignation dans checkCalcul");
+    nextToken(input);
+    while (input->nextToken != NULL && isOperator(input->type)) {
+        nextToken(input);
+        if(input->type != IDENTIFIER && input->type != NUMBER) error("Mauvaise assignation dans checkCalcul 2");
+        nextToken(input);
+    }
+}
+
+void checkParentheses(Token *input) {
+    int parentheseCheck = 0;
+    int crochetCheck = 0;
+    int accoladeCheck = 0;
+    while(input->nextToken != NULL) {
+        if(strcmp(input->value, "(") == 0) parentheseCheck++;
+        if(strcmp(input->value, ")") == 0) {
+            parentheseCheck--;
+            if(parentheseCheck<0) error("Mauvaise gestion de parenthèse");
         }
 
-        // On free tout
-        freeToken(inputToken);
+        if(strcmp(input->value, "[") == 0) crochetCheck++;
+        if(strcmp(input->value, "]") == 0) {
+            crochetCheck--;
+            error("Mauvaise gestion de crochet");
+        }
+
+        if(strcmp(input->value, "}") == 0) accoladeCheck++;
+        if(strcmp(input->value, "{") == 0) {
+            accoladeCheck--;
+            error("Mauvaise gestion de accolade");
+        }
+        input=input->nextToken;
     }
+    if(parentheseCheck != 0 || accoladeCheck != 0 || crochetCheck != 0) error("Mauvaise gestion des délimiteurs");
 }

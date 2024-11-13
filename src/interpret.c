@@ -13,6 +13,7 @@
 void interpret(char *input) {
     Token *token = NULL;
     token = lexer(input, token);
+    parser(token);
     while (token->nextToken != NULL) {
         if (token->type == PRINT) {
             parserPrint(token);

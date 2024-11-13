@@ -4,7 +4,7 @@
 
 #ifndef PARSER_H
 #define PARSER_H
-
+#include "token.h"
 typedef enum inputType {
     FUNCTION,
     NUMBER, // 0 1 2 3...
@@ -39,4 +39,11 @@ void parser(char *input);
 
 int calculShuttingYard(char *input);
 
+void error(char *msg);
+
+void nextToken(Token *input);
+
+void checkCalcul(Token *input);
+
+void checkParentheses(Token *input);
 #endif //PARSER_H
