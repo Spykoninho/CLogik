@@ -18,12 +18,25 @@ void parser(Token *input) {
             input = nextToken(input);
             if(input->type != ASSIGN)
                 if(!isOperator(input->type)) error("Assignation ou calcul manquant");
-            input = nextToken(input);
 
-            input = checkCalcul(input);
+            input = nextToken(input);
+            if(input->type == TOKENSTRING) {
+                if(isOperator(input->nextToken->type)) {
+                    input = checkCalcul(input); // FIXE : régler le bug pour calcul de string
+                }
+            }else {
+                input = checkCalcul(input);
+            }
+            input = nextToken(input);
             break;
-        }else if(input->type == FUNCTION) {
+        }
+        if(input->type == FUNCTION) {
             // verif syntaxe des fonctions, rajouter dans lexer du coup le type fonction puis adapter le code d'après, ici verif conditions et boucles
+            input = nextToken(input);
+            if(input->type != LPAREN) error("Parentheses gauche manquante");
+            input = checkCalcul(input);
+            if(input->type != RPAREN) error("Parentheses gauche manquante");
+            input = nextToken(input);
         }else if(input->type == NUMBER) {
             // verif quand on met un calcul random
         }else if(input->type == SEMICOLON) {
@@ -57,8 +70,8 @@ Token * checkCalcul(Token *input) {
             continue;
         }
         if(modulo2 % 2 == 0 && isOperator(input->type)) error("Operateur dans le mauvais ordre");
-        if(modulo2 % 2 == 1 && (input->type == IDENTIFIER || input->type == NUMBER)) error("Operandes dans le mauvais ordre");
-        if(input->type != IDENTIFIER && input->type != NUMBER && !isOperator(input->type)) error("Mauvais type de donnée dans le calcul");
+        if(modulo2 % 2 == 1 && (input->type == IDENTIFIER || input->type == NUMBER || input->type==TOKENSTRING)) error("Operandes dans le mauvais ordre");
+        if(input->type != IDENTIFIER && input->type != NUMBER && !isOperator(input->type) && input->type!=TOKENSTRING) error("Mauvais type de donnée dans le calcul");
         input = nextToken(input);
         modulo2++;
     }
