@@ -10,7 +10,6 @@
 #include "../headers/print.h"
 
 void parser(Token *input) {
-    printTokens(input);
     while (input->nextToken != NULL) {
         if(input->type == UNKNOWN) error("unknown token");
 
@@ -39,15 +38,8 @@ void parser(Token *input) {
             if(input->type != RPAREN) error("Parentheses droite manquante");
             input = nextToken(input);
             break;
-        }else if(input->type == NUMBER) {
-            // verif quand on met un calcul random
-        }else if(input->type == SEMICOLON) {
-            if(input->nextToken != NULL) error("Mauvais ordre");
-        }else {
-            printf("error at : %s\n", input->value);
-            error("Mauvais ordre 2 :");
         }
-        input=nextToken(input);
+        error("Entree non prise en charge");
     }
     if(strcmp(input->value, ";") != 0) error("; manquant");
 }
