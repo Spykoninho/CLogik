@@ -16,7 +16,7 @@ void parser(Token *input) {
         if(input->type == IDENTIFIER) {
             input = nextToken(input);
             if(input->type != ASSIGN)
-                if(!isOperator(input->type)) error("Assignation ou calcul manquant");
+                error("Assignation manquante.");
 
             input = nextToken(input);
             if(input->type == TOKENSTRING) {
