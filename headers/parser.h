@@ -17,4 +17,6 @@ Token * nextToken(Token *input);
 Token * checkCalcul(Token *input);
 
 void checkParentheses(Token *input);
+
+Token * checkPrint(Token *input);
 #endif //PARSER_H

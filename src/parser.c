@@ -32,13 +32,13 @@ void parser(Token *input) {
             input = nextToken(input);
             break;
         }
-        if(input->type == FUNCTION) {
-            // verif syntaxe des fonctions, rajouter dans lexer du coup le type fonction puis adapter le code d'après, ici verif conditions et boucles
+        if(input->type == PRINT) {
             input = nextToken(input);
             if(input->type != LPAREN) error("Parentheses gauche manquante");
-            input = checkCalcul(input);
-            if(input->type != RPAREN) error("Parentheses gauche manquante");
+            input = checkPrint(input);
+            if(input->type != RPAREN) error("Parentheses droite manquante");
             input = nextToken(input);
+            break;
         }else if(input->type == NUMBER) {
             // verif quand on met un calcul random
         }else if(input->type == SEMICOLON) {
@@ -106,4 +106,24 @@ void checkParentheses(Token *input) {
     }
     if(strcmp(input->value, ";") != 0) error("; manquant");
     if(parentheseCheck != 0 || accoladeCheck != 0 || crochetCheck != 0) error("Mauvaise gestion des delimiteurs");
+}
+
+Token * checkPrint(Token *input) {
+    checkParentheses(input);
+    int modulo2 = 0;
+    while (input->nextToken != NULL) {
+        if(input->nextToken->type == SEMICOLON && input->type == RPAREN) {
+            return input;
+        }
+        if(input->type == LPAREN || input->type == RPAREN) {
+            input=nextToken(input);
+            continue;
+        }
+        if(modulo2 % 2 == 0 && isOperator(input->type)) error("Operateur dans le mauvais ordre");
+        if(modulo2 % 2 == 1 && (input->type == IDENTIFIER || input->type == NUMBER || input->type==TOKENSTRING)) error("Operandes dans le mauvais ordre");
+        if(input->type != IDENTIFIER && input->type != NUMBER && !isOperator(input->type) && input->type!=TOKENSTRING) error("Mauvais type de donnée dans le calcul");
+        input = nextToken(input);
+        modulo2++;
+    }
+    return input;
 }
