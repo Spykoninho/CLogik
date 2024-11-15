@@ -50,7 +50,7 @@ void parserPrint(Token *token) {
                 if (checkVar->type == STRING) isVarString = 1;
             } else {
                 printf("Erreur : La variable n'existe pas\n");
-                exit(1);
+                return;
             }
         }
 
@@ -110,7 +110,7 @@ void parserPrint(Token *token) {
                             printf("Erreur de reallocation de memoire pour tempTokenCalcul->value\n");
                             freeVariable(variables);
                             freeTokens(token);
-                            exit(1);
+                            return;
                         }
                         // nouvelle taille pour la value
                         tempTokenCalcul->value = tempRealloc;
@@ -119,7 +119,7 @@ void parserPrint(Token *token) {
                     } else {
                         printf("Erreur : variable '%s' inexistante\n", tempTokenCalcul->value);
                         freeVariable(variables);
-                        exit(1);
+                        return;
                     }
                 }
                 tempTokenCalcul = tempTokenCalcul->nextToken;
@@ -132,7 +132,8 @@ void parserPrint(Token *token) {
             printf("Result Print: %g\n", result);
             return;
         }
-    }else if (token->type == IDENTIFIER) {
+    }
+    if (token->type == IDENTIFIER) {
         if (isVarExists(variables, token->value)) {
             Var *var = getVariable(variables, token->value);
             token = token->nextToken;
@@ -140,11 +141,16 @@ void parserPrint(Token *token) {
                 printf("Error: missing ')' after print\n");
                 return;
             }
-            if(var->type == INT || var->type == DOUBLE) {
-                printf("Result Print: %g\n", var->value);
+            if(var->type == INT) {
+                int result = strtol(var->value, NULL, 10);
+                printf("Result Print: %d\n", result);
+            }else if(var->type == DOUBLE) {
+                double result = strtod(var->value, NULL);
+                printf("Result Print: %g\n", result);
             }else {
                 printf("Result Print: %s\n", var->value);
             }
+            return;
         } else {
             printf("Erreur : la variable n'existe pas\n");
             return;
