@@ -22,10 +22,12 @@ void parser(Token *input) {
             input = nextToken(input);
             if(input->type == TOKENSTRING) {
                 if(isOperator(input->nextToken->type)) {
-                    input = checkCalcul(input); // FIXE : régler le bug pour calcul de string
+                    input = checkCalcul(input);
+                    break;
                 }
             }else {
                 input = checkCalcul(input);
+                break;
             }
             input = nextToken(input);
             break;
