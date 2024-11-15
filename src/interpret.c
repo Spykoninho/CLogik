@@ -9,6 +9,7 @@
 #include "../headers/print.h"
 #include "../headers/token.h"
 #include "../headers/variable.h"
+#include "../headers/parser.h"
 
 void interpret(char *input) {
     Token *token = NULL;
