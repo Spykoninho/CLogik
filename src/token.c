@@ -228,7 +228,6 @@ double calcul(Token *token) {
 
     // Libération de mémoire
     freeAST(astRoot);
-    printf("test\n");
     //freeTokens(stToken);
 
     return result;
