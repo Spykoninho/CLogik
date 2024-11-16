@@ -66,4 +66,5 @@ Token *popBufferToken(Token *head);
 
 Token *addBufferToken(Token *head, const Type type, const char *value);
 
+
 #endif //TOKEN_H

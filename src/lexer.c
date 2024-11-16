@@ -116,11 +116,14 @@ Token *lexer(char *string, Token *token) {
             }
             if (strcmp(longString, "print") == 0) {
                 token = addToken(token, PRINT, longString);
-                continue;
+            } else if (strcmp(longString, "if") == 0) {
+                token = addToken(token, KEYWORD, longString); // Ajoute le mot-clé "if"
+            } else if (strcmp(longString, "while") == 0) {
+                token = addToken(token, KEYWORD, longString); // Ajoute le mot-clé "while"
             } else {
-                token = addToken(token, IDENTIFIER, longString);
-                continue;
+                token = addToken(token, IDENTIFIER, longString); // Traite comme un identifiant normal
             }
+            continue;
         }
         string++;
     }

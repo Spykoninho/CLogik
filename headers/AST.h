@@ -7,13 +7,15 @@
 
 
 typedef enum {
-    NODE_TYPE_IF,
+    NODE_TYPE_IF = 1,
     NODE_TYPE_WHILE,
     NODE_TYPE_PRINT,
     NODE_TYPE_OPERATION,
     NODE_TYPE_NUMBER,
     NODE_TYPE_VARIABLE
 } NodeType;
+
+
 
 typedef struct ASTNode {
     NodeType type;
