@@ -12,9 +12,14 @@ int main(void) {
     printf("Entrez votre code : \n");
     do {
         fgets(input, 100, stdin);
+        if (userWantsToQuit(input)) break;
         interpret(input);
-    } while (strcmp(input, "q") != 0);
+    } while (!userWantsToQuit(input));
 
     freeVariable(variables);
     return 0;
+}
+
+int userWantsToQuit(char *input) {
+    return strcmp(input, "q") != 0|| strcmp(input, "quit") != 0 || strcmp(input, "panic();") != 0;
 }
