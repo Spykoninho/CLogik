@@ -117,6 +117,18 @@ Token *lexer(char *string, Token *token) {
             if (strcmp(longString, "print") == 0) {
                 token = addToken(token, PRINT, longString);
                 continue;
+            } else if (strcmp(longString, "if") == 0) {
+                token = addToken(token, IF, longString);
+                continue;
+            } else if (strcmp(longString, "else") == 0) {
+                token = addToken(token, ELSE, longString);
+                continue;
+            } else if (strcmp(longString, "true") == 0) {
+                token = addToken(token, TRUE, longString);
+                continue;
+            } else if (strcmp(longString, "false") == 0) {
+                token = addToken(token, FALSE, longString);
+                continue;
             } else {
                 token = addToken(token, IDENTIFIER, longString);
                 continue;
@@ -180,6 +192,14 @@ char *getType(int type) {
             return "DOT";
         case PRINT:
             return "PRINT";
+        case IF:
+            return "IF";
+        case ELSE:
+            return "ELSE";
+        case TRUE:
+            return "TRUE";
+        case FALSE:
+            return "FALSE";
         default:
             return "UNKNOWN";
     }

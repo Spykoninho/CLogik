@@ -14,9 +14,11 @@
 void interpret(char *input) {
     Token *token = NULL;
     token = lexer(input, token);
+    int condition = 0;
+
     parser(token);
     while (token->nextToken != NULL) {
-        if (token->type == PRINT) {
+        if (token->type == PRINT && condition == 0) {
             parserPrint(token);
         } else if (token->type == IDENTIFIER) {
             const Token *tempToken = token->nextToken;
@@ -24,6 +26,11 @@ void interpret(char *input) {
                 addVariable(token);
                 printVariables(variables);
             }
+        }
+        else if (token->type == IF) {
+            condition = 1;
+            parserIf(token);
+
         }
 
         if (token->nextToken != NULL) token = token->nextToken;

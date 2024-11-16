@@ -5,6 +5,7 @@
 #ifndef INTERPRET_H
 #define INTERPRET_H
 #include "variable.h"
+#include "condition.h"
 
 void interpret(char *input);
 
