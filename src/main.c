@@ -7,13 +7,22 @@
 
 extern Var *variable;
 
+
 void interactive_mode() {
     char input[100];
     printf("Mode interactif : Entrez votre code (tapez 'q' pour quitter) :\n");
     do {
         printf("> ");
         fgets(input, 100, stdin);
-        interpret(input);
+        // Vérifie si la commande est "AST"
+        if (strcmp(input, "AST\n") == 0) {
+            astEnabled = !astEnabled; // Change l'état d'affichage de l'AST
+            printf("Affichage AST %s\n", astEnabled ? "active" : "desactive");
+        }
+        else {
+            interpret(input);
+        }
+
     } while (strcmp(input, "q\n") != 0);
 }
 

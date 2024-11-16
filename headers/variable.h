@@ -21,6 +21,8 @@ typedef struct Variable {
 
 extern Var* variables;
 
+extern int astEnabled;
+
 Var *addVariable(Token *input);
 
 void freeVariable(Var *variable);

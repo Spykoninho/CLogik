@@ -8,6 +8,7 @@
 #include "../headers/lexer.h"
 #include "../headers/parser.h"
 #include "../headers/AST.h"
+#include "../headers/variable.h"
 
 
 // Ajouter un token
@@ -223,8 +224,11 @@ double calcul(Token *token) {
     ASTNode *astRoot = astStack[astStackTop];
 
     // Afficher l'AST après le calcul
-    printf("AST de l'expression :\n");
-    displayASTGraph(astRoot);
+    if (astEnabled == 1) {
+        printf("AST de l'expression :\n");
+        displayASTGraph(astRoot);
+    }
+
 
     // Libération de mémoire
     freeAST(astRoot);
