@@ -8,6 +8,7 @@
 #include "../headers/parser.h"
 #include "../headers/lexer.h"
 #include "../headers/print.h"
+#include "../headers/condition.h"
 
 #define BUFFER_SIZE 1024
 #define SHUTTINGYARDSTRING_SIZE 1024
@@ -22,6 +23,9 @@ void parser(char *input) {
         switch (inputToken->type) {
             case PRINT:
                 parserPrint(inputToken);
+                break;
+            case IF:
+                parserCondition(inputToken);
                 break;
             default:
                 // on copie le resultat de la fonction qui permet de l'avoir dans notre string
