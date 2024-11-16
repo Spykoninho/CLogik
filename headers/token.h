@@ -4,7 +4,36 @@
 
 #ifndef TOKEN_H
 #define TOKEN_H
-#include "parser.h"
+
+typedef enum inputType {
+    FUNCTION,
+    NUMBER, // 0 1 2 3...
+    TOKENSTRING,
+    KEYWORD, // if...
+    LPAREN, // (
+    RPAREN, // )
+    IDENTIFIER, // variable
+    PLUS, // +
+    MINUS, // -
+    MULT, // *
+    DIV, // /
+    MOD, // % (à implémenter avec les conditions)
+    POW,
+    GREATER, // >
+    LESS, // <
+    GREATEREQ, // >=
+    LESSEQ, // <=
+    EQUAL, // ==
+    NOT, // !
+    NOTEQUAL, // !=
+    LBRACE, // {
+    RBRACE, // }
+    SEMICOLON, // ;
+    ASSIGN, // =
+    DOT, // .
+    PRINT, // print
+    UNKNOWN = -1 // quand le lexer sait pas ou que c'est pas encore implémenté
+} Type;
 
 typedef struct token {
     Type type;

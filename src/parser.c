@@ -10,31 +10,113 @@
 #include "../headers/print.h"
 #include "../headers/condition.h"
 
-#define BUFFER_SIZE 1024
-#define SHUTTINGYARDSTRING_SIZE 1024
+void parser(Token *input) {
+    while (input->nextToken != NULL) {
+        if(input->type == UNKNOWN) error("unknown token");
 
-// Comprend le code pour l'éxecuter ensuite
-void parser(char *input) {
-    // crée la suite de token en fonction de l'input
-    Token *inputToken = NULL;
-    inputToken = lexer(input, inputToken);
-    // Si il y a bien des instructions
-    if (inputToken != NULL) {
-        switch (inputToken->type) {
-            case PRINT:
-                parserPrint(inputToken);
+        if(input->type == IDENTIFIER) {
+            input = nextToken(input);
+            if(input->type != ASSIGN)
+                error("Assignation manquante.");
+
+            input = nextToken(input);
+            if(input->type == TOKENSTRING) {
+                if(isOperator(input->nextToken->type)) {
+                    input = checkCalcul(input);
+                    break;
+                }
+            }else {
+                input = checkCalcul(input);
                 break;
-            case IF:
-                parserCondition(inputToken);
-                break;
-            default:
-                // on copie le resultat de la fonction qui permet de l'avoir dans notre string
-                double result = calcul(inputToken);
-                printf("Result : %lf\n", result);
-                break;
+            }
+            input = nextToken(input);
+            break;
+        }
+        if(input->type == PRINT) {
+            input = nextToken(input);
+            if(input->type != LPAREN) error("Parentheses gauche manquante");
+            input = checkPrint(input);
+            if(input->type != RPAREN) error("Parentheses droite manquante");
+            input = nextToken(input);
+            break;
+        }
+        error("Entree non prise en charge");
+    }
+    if(strcmp(input->value, ";") != 0) error("; manquant");
+}
+
+void error(char *msg) {
+    printf("%s\n", msg);
+    exit(1);
+}
+
+Token * nextToken(Token *input) {
+    input=input->nextToken;
+    if(input == NULL) error("Ligne non finie correctement");
+    return input;
+}
+
+Token * checkCalcul(Token *input) {
+    checkParentheses(input);
+    int modulo2 = 0;
+    while (input->nextToken != NULL) {
+        if(input->type == LPAREN || input->type == RPAREN) {
+            input=nextToken(input);
+            continue;
+        }
+        if(modulo2 % 2 == 0 && isOperator(input->type)) error("Operateur dans le mauvais ordre");
+        if(modulo2 % 2 == 1 && (input->type == IDENTIFIER || input->type == NUMBER || input->type==TOKENSTRING)) error("Operandes dans le mauvais ordre");
+        if(input->type != IDENTIFIER && input->type != NUMBER && !isOperator(input->type) && input->type!=TOKENSTRING) error("Mauvais type de donnée dans le calcul");
+        input = nextToken(input);
+        modulo2++;
+    }
+    return input;
+}
+
+void checkParentheses(Token *input) {
+    int parentheseCheck = 0;
+    int crochetCheck = 0;
+    int accoladeCheck = 0;
+    while(input->nextToken != NULL) {
+        if(strcmp(input->value, "(") == 0) parentheseCheck++;
+        if(strcmp(input->value, ")") == 0) {
+            parentheseCheck--;
+            if(parentheseCheck<0) error("Mauvaise gestion de parenthèse");
         }
 
-        // On free tout
-        freeToken(inputToken);
+        if(strcmp(input->value, "[") == 0) crochetCheck++;
+        if(strcmp(input->value, "]") == 0) {
+            crochetCheck--;
+            error("Mauvaise gestion de crochet");
+        }
+
+        if(strcmp(input->value, "}") == 0) accoladeCheck++;
+        if(strcmp(input->value, "{") == 0) {
+            accoladeCheck--;
+            error("Mauvaise gestion de accolade");
+        }
+        input = nextToken(input);
     }
+    if(strcmp(input->value, ";") != 0) error("; manquant");
+    if(parentheseCheck != 0 || accoladeCheck != 0 || crochetCheck != 0) error("Mauvaise gestion des delimiteurs");
+}
+
+Token * checkPrint(Token *input) {
+    checkParentheses(input);
+    int modulo2 = 0;
+    while (input->nextToken != NULL) {
+        if(input->nextToken->type == SEMICOLON && input->type == RPAREN) {
+            return input;
+        }
+        if(input->type == LPAREN || input->type == RPAREN) {
+            input=nextToken(input);
+            continue;
+        }
+        if(modulo2 % 2 == 0 && isOperator(input->type)) error("Operateur dans le mauvais ordre");
+        if(modulo2 % 2 == 1 && (input->type == IDENTIFIER || input->type == NUMBER || input->type==TOKENSTRING)) error("Operandes dans le mauvais ordre");
+        if(input->type != IDENTIFIER && input->type != NUMBER && !isOperator(input->type) && input->type!=TOKENSTRING) error("Mauvais type de donnée dans le calcul");
+        input = nextToken(input);
+        modulo2++;
+    }
+    return input;
 }
