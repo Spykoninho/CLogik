@@ -21,5 +21,10 @@ int main(void) {
 }
 
 int userWantsToQuit(char *input) {
-    return strcmp(input, "q") == 0|| strcmp(input, "quit") == 0 || strcmp(input, "panic();") == 0;
+    char* ptr = strchr(input, '\n');
+    if (ptr) {
+        // if new line found replace with null character
+        *ptr = '\0';
+    }
+    return strcmp(input, "q") == 0 || strcmp(input, "quit") == 0 || strcmp(input, "panic();") == 0;
 }
