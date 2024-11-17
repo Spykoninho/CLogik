@@ -6,6 +6,7 @@
 #include "../headers/variable.h"
 #include <string.h>
 #include "../headers/lexer.h"
+#include "../headers/parser.h"
 
 // Ajouter une variable dans la liste headVar qui contient toutes les variables
 Var *addVariable(Token *token) {
@@ -34,6 +35,7 @@ Var *addVariable(Token *token) {
                 freeVariable(variables);
                 exit(1);
             }
+            newVar->scope = actualScope;
 
             newVar->name = malloc(strlen(token->value) + 1);
             if (newVar->name == NULL) {
@@ -264,6 +266,7 @@ Var *addVariable(Token *token) {
 Var *getVariable(Var *var, char *searchedVar) {
     while (var != NULL) {
         if (strcmp(var->name, searchedVar) == 0) {
+            if(var->scope > actualScope) error("Cette variable n'est pas atteignable");
             return var;
         }
         var = var->nextVar;
@@ -280,7 +283,7 @@ void printVariables(Var *var) {
         return;
     }
     if (var->nextVar != NULL) printVariables(var->nextVar);
-    printf("%s %s %s\n", getVarType(var->type), var->name, var->value);
+    printf("type : %s nom : %s valeur : %s scope : %d\n", getVarType(var->type), var->name, var->value, var->scope);
 }
 
 // freeVariables
@@ -296,6 +299,7 @@ void freeVariable(Var *variable) {
 int isVarExists(Var *var, const char *searchedVar) {
     while (var != NULL) {
         if (strcmp(var->name, searchedVar) == 0) {
+            if(var->scope > actualScope) error("Cette variable n'est pas accessible");
             return 1;
         }
         var = var->nextVar;
