@@ -5,7 +5,7 @@ int evaluateIfCondition(Token *token) {
     if (token->type == FALSE) return 0;
 }
 
-void parseBlock(Token *token) {
+void parseBlockIf(Token *token) {
     while (token != NULL && token->type != RBRACE) {
         if (token->type == PRINT) {
             parserPrint(token);
@@ -46,7 +46,7 @@ void parserIf(Token *token) {
             return;
         }
 
-        parseBlock(token->nextToken);
+        parseBlockIf(token->nextToken);
     } else {
         token = token->nextToken;
         if (token != NULL && token->type == ELSE) {
@@ -55,7 +55,7 @@ void parserIf(Token *token) {
                 printf("Erreur il manque { apres le else\n");
                 return;
             }
-            parseBlock(token->nextToken);
+            parseBlockIf(token->nextToken);
         }
     }
 }

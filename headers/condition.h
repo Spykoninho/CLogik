@@ -12,7 +12,7 @@
 
 
 int evaluateIfCondition(Token *token);
-void parseBlock(Token *token);
+void parseBlockIf(Token *token);
 void parserIf(Token *token);
 
 #endif
