@@ -47,7 +47,10 @@ void parser(Token *input) {
         if (input->type == KEYWORD) {
             if (strcmp(input->value, "while") == 0) {
                 input = parseWhile(&input);
-                continue; // Passe à la prochaine instruction
+                if (input == NULL) {
+                    return;
+                }
+                break; // Passe à la prochaine instruction
 
             }
         }
@@ -193,6 +196,7 @@ ASTNode *parseBlock(Token **currentToken) {
         error("Accolade gauche manquante pour le bloc");
     }
 
+    actualScope++;
     *currentToken = (*currentToken)->nextToken; // Passe l'accolade gauche
 
     ASTNode *block = NULL; // Liste des instructions dans le bloc
@@ -209,7 +213,7 @@ ASTNode *parseBlock(Token **currentToken) {
             *currentToken = (*currentToken)->nextToken; // Passe le point-virgule
         }
     }
-
+    actualScope--;
     *currentToken = (*currentToken)->nextToken; // Passe l'accolade droite
     return block;
 }
@@ -332,6 +336,7 @@ double evaluateAST(ASTNode *node) {
                     printf("Erreur : allocation mémoire échouée pour la variable\n");
                     exit(1);
                 }
+                var->scope = actualScope;
                 var->name = strdup(node->variableName);
                 var->nextVar = variables;
                 variables = var; // Ajoute à la liste des variables
@@ -388,10 +393,10 @@ double evaluateAST(ASTNode *node) {
                 exit(1);
             }
             if (var->type == STRING) {
-                printf("Valeur de la variable '%s' : \"%s\" (STRING)\n", var->name, var->value);
+                printf("Valeur de la variable '%s' : \"%s\" \"%d\" (STRING)\n", var->name, var->value,var->scope);
                 return 0; // Les chaînes ne sont pas évaluées comme des nombres
             } else {
-                printf("Valeur de la variable '%s' : %s (%s)\n", var->name, var->value, getVarType(var->type));
+                printf("Valeur de la variable '%s' : %s   %d (%s)\n ", var->name, var->value,var->scope , getVarType(var->type));
                 return atof(var->value);
             }
         }
@@ -433,6 +438,7 @@ double evaluateAST(ASTNode *node) {
         case NODE_TYPE_WHILE: {
             printf("Neoud WHILE : debut de la boucle\n");
             int iteration = 0;
+            actualScope++;
             while (evaluateAST(node->controlFlow.condition)) {
                 iteration++;
                 printf("WHILE : Début de l'itération %d\n", iteration);
@@ -446,6 +452,7 @@ double evaluateAST(ASTNode *node) {
 
                 printf("WHILE : Fin de l'itération %d\n", iteration);
             }
+            actualScope--;
             printf("Neoud WHILE : boucle terminee\n");
             return 0;
         }
