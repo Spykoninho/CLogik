@@ -114,9 +114,12 @@ Token *lexer(char *string, Token *token) {
                 strcat(longString, charToString);
                 *string++;
             }
-            if (strcmp(longString, "print") == 0) {
+            if (strcmp(longString, "AST") == 0) {
+                token = addToken(token, AST, longString);
+            }else if (strcmp(longString, "print") == 0) {
                 token = addToken(token, PRINT, longString);
-                continue;
+            } else if (strcmp(longString, "while") == 0) {
+                token = addToken(token, KEYWORD, longString); // Ajoute le mot-clé "while"
             } else if (strcmp(longString, "if") == 0) {
                 token = addToken(token, IF, longString);
                 continue;
@@ -130,9 +133,9 @@ Token *lexer(char *string, Token *token) {
                 token = addToken(token, FALSE, longString);
                 continue;
             } else {
-                token = addToken(token, IDENTIFIER, longString);
-                continue;
+                token = addToken(token, IDENTIFIER, longString); // Traite comme un identifiant normal
             }
+            continue;
         }
         string++;
     }
@@ -192,14 +195,6 @@ char *getType(int type) {
             return "DOT";
         case PRINT:
             return "PRINT";
-        case IF:
-            return "IF";
-        case ELSE:
-            return "ELSE";
-        case TRUE:
-            return "TRUE";
-        case FALSE:
-            return "FALSE";
         default:
             return "UNKNOWN";
     }

@@ -16,10 +16,15 @@ typedef struct Variable {
     VarType type;
     char *name;
     char *value;
+    int scope;
     struct Variable *nextVar;
 } Var;
 
 extern Var* variables;
+
+extern int astEnabled;
+
+extern int actualScope;
 
 Var *addVariable(Token *input);
 
