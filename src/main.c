@@ -12,6 +12,7 @@ int main(void) {
     printf("Entrez votre code : \n");
     do {
         fgets(input, 100, stdin);
+        if (strcmp(input, "\n") == 0) continue; // autorise les sauts de ligne
         if (userWantsToQuit(input)) break;
         interpret(input);
     } while (!userWantsToQuit(input));
