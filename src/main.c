@@ -7,13 +7,14 @@
 
 extern Var *variable;
 
-
 void interactive_mode() {
     char input[100];
     printf("Mode interactif : Entrez votre code (tapez 'q' pour quitter) :\n");
     do {
         printf("> ");
         fgets(input, 100, stdin);
+        if (strcmp(input, "\n") == 0) continue; // autorise les sauts de ligne
+        if (userWantsToQuit(input)) break;
         // Vérifie si la commande est "AST"
         if (strcmp(input, "AST\n") == 0) {
             astEnabled = !astEnabled; // Change l'état d'affichage de l'AST
@@ -23,7 +24,7 @@ void interactive_mode() {
             interpret(input);
         }
 
-    } while (strcmp(input, "q\n") != 0);
+    } while (!userWantsToQuit(input));
 }
 
 void file_mode(const char *filename) {
@@ -54,4 +55,13 @@ int main(int argc, char *argv[]) {
     }
 
     return 0;
+}
+
+int userWantsToQuit(char *input) {
+    char* ptr = strchr(input, '\n');
+    if (ptr) {
+        // if new line found replace with null character
+        *ptr = '\0';
+    }
+    return strcmp(input, "q") == 0 || strcmp(input, "quit") == 0 || strcmp(input, "panic();") == 0;
 }
