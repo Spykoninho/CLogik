@@ -32,6 +32,7 @@ typedef enum inputType {
     ASSIGN, // =
     DOT, // .
     PRINT, // print
+    AST,
     UNKNOWN = -1 // quand le lexer sait pas ou que c'est pas encore implémenté
 } Type;
 
@@ -65,5 +66,6 @@ double calcul(Token *stToken);
 Token *popBufferToken(Token *head);
 
 Token *addBufferToken(Token *head, const Type type, const char *value);
+
 
 #endif //TOKEN_H

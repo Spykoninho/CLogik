@@ -7,6 +7,9 @@
 #include "../headers/token.h"
 #include "../headers/lexer.h"
 #include "../headers/parser.h"
+#include "../headers/AST.h"
+#include "../headers/variable.h"
+
 
 // Ajouter un token
 Token *addToken(Token *head, const Type type, const char *value) {
@@ -126,25 +129,27 @@ double calcul(Token *token) {
     Token *actualStToken = stToken;
     double result = 0;
 
+    ASTNode *astStack[100];
+    int astStackTop = -1;
+
     while (actualStToken != NULL) {
-        // Si c'est un opérateur, on effectue le calcul
         if (isOperator(actualStToken->type)) {
-            // On récupère les deux derniers opérandes de la pile
-            Token *op2Token = stTokenPile; // le dernier
+            // On récupère les deux derniers opérandes de la pile pour le calcul
+            Token *op2Token = stTokenPile;  // Le dernier opérande
             if (stTokenPile == NULL || stTokenPile->previousToken == NULL) {
-                printf("Erreur, token manquant");
+                printf("Erreur, token manquant\n");
                 exit(0);
             }
             stTokenPile = stTokenPile->previousToken;
-            Token *op1Token = stTokenPile; // l'avant-dernier
+            Token *op1Token = stTokenPile;  // L'avant-dernier opérande
             stTokenPile = stTokenPile->previousToken;
 
-            // Convertir les opérandes en double
+            // Convertir les opérandes en double pour le calcul
             char *error1, *error2;
             double operator1 = strtod(op1Token->value, &error1);
             double operator2 = strtod(op2Token->value, &error2);
             if (op1Token->value == error1 || op2Token->value == error2) {
-                printf("Error converting operands to double.\n");
+                printf("Erreur de conversion en double.\n");
                 exit(0);
             }
 
@@ -161,7 +166,7 @@ double calcul(Token *token) {
                     break;
                 case DIV:
                     if (operator2 == 0) {
-                        printf("Division par zero interdit\n");
+                        printf("Division par zéro interdite\n");
                         freeTokens(token);
                         exit(0);
                     }
@@ -169,52 +174,66 @@ double calcul(Token *token) {
                     break;
                 case MOD:
                     if (operator2 == 0) {
-                        printf("Modulo par zero interdit.\n");
+                        printf("Modulo par zéro interdit.\n");
                         freeTokens(token);
                         exit(0);
                     }
-                    result = (long) operator1 % (long) operator2;
+                    result = (long)operator1 % (long)operator2;
                     break;
                 default:
                     printf("Mauvais opérateur\n");
                     return 0;
             }
 
+            // Crée un nœud d'AST pour l'opération
+            char operatorChar = actualStToken->type == PLUS ? '+' :
+                                actualStToken->type == MINUS ? '-' :
+                                actualStToken->type == MULT ? '*' :
+                                actualStToken->type == DIV ? '/' : '%';
+            ASTNode *rightNode = astStack[astStackTop--];
+            ASTNode *leftNode = astStack[astStackTop--];
+            ASTNode *operationNode = createOperationNode(operatorChar, leftNode, rightNode);
+            astStack[++astStackTop] = operationNode;
+
             // Mettre le résultat dans la pile
             char *resultValue = malloc(sizeof(char) * 100);
             sprintf(resultValue, "%lf", result);
-
             Token *resultToken = malloc(sizeof(Token));
             resultToken->type = NUMBER;
             resultToken->value = resultValue;
             resultToken->previousToken = stTokenPile;
-            stTokenPile = resultToken; // Premier arrivé futur premier à sortir (Last in first out)
+            stTokenPile = resultToken;
 
             // Libérer les opérandes après le calcul
             freeToken(op1Token);
             freeToken(op2Token);
         } else {
-            // Si ce n'est pas un opérateur, on push l'élément dans la pile
+            // Si c'est un nombre, crée un nœud d'AST pour ce nombre
+            double value = strtod(actualStToken->value, NULL);
+            ASTNode *numberNode = createNumberNode(value);
+            astStack[++astStackTop] = numberNode;
+
+            // Empiler l'élément dans la pile de tokens comme avant
             actualStToken->previousToken = stTokenPile;
             stTokenPile = actualStToken;
         }
         actualStToken = actualStToken->nextToken;
     }
 
-    // Récupérer le résultat final
-    char *error3;
-    if (stTokenPile != NULL) result = strtod(stTokenPile->value, &error3);
-    else {
-        printf("stTokenPile is empty\n");
-        freeTokens(token);
-        exit(0);
+    // La racine de l'AST est le dernier noeud de la pile AST
+    ASTNode *astRoot = astStack[astStackTop];
+
+    // Afficher l'AST après le calcul
+    if (astEnabled == 1) {
+        printf("AST de l'expression :\n");
+        displayASTGraph(astRoot);
     }
-    if (error3 == stTokenPile->value) {
-        printf("Error converting operands to double.\n");
-        freeTokens(token);
-        exit(0);
-    }
-    freeToken(stTokenPile); // Libérer la mémoire du dernier token
+
+
+    // Libération de mémoire
+    freeAST(astRoot);
+    //freeTokens(stToken);
+
     return result;
 }
 
