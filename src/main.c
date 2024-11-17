@@ -13,14 +13,7 @@ void interactive_mode() {
         if (strcmp(input, "\n") == 0) continue; // autorise les sauts de ligne
         if (userWantsToQuit(input)) break;
         // Vérifie si la commande est "AST"
-        if (strcmp(input, "AST\n") == 0) {
-            astEnabled = !astEnabled; // Change l'état d'affichage de l'AST
-            printf("Affichage AST %s\n", astEnabled ? "active" : "desactive");
-        }
-        else {
-            interpret(input);
-        }
-
+        interpret(input);
     } while (!userWantsToQuit(input));
 }
 

@@ -41,17 +41,17 @@ void parser(Token *input) {
             break;
         }
         if (input->type == KEYWORD) {
-            if (strcmp(input->value, "if") == 0) {
-                ASTNode *ifNode = parseIf(&input);
-                evaluateAST(ifNode);
-                freeAST(ifNode); // Libère la mémoire
-                continue; // Passe à la prochaine instruction
-            } else if (strcmp(input->value, "while") == 0) {
+            if (strcmp(input->value, "while") == 0) {
                 ASTNode *whileNode = parseWhile(&input);
                 evaluateAST(whileNode);
                 freeAST(whileNode); // Libère la mémoire
                 continue; // Passe à la prochaine instruction
             }
+        }
+
+        if(input->type == AST) {
+            input = nextToken(input);
+            continue;
         }
 
         printf("%s\n", input->value);
@@ -417,16 +417,6 @@ ASTNode *createVariableOrNumberNode(Token **currentToken) {
 
     return node;
 }
-
-
-
-
-
-
-
-
-
-
 
 void error(char *msg) {
     printf("%s\n", msg);
