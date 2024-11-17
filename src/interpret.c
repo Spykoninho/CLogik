@@ -14,8 +14,15 @@
 void interpret(char *input) {
     Token *token = NULL;
     token = lexer(input, token);
-    printTokens(token);
     parser(token);
+    if(token->type == LBRACE) {
+        actualScope++;
+        return;
+    }
+    if(token->type == RBRACE) {
+        actualScope--;
+        return;
+    }
     while (token->nextToken != NULL) {
         if (token->type == PRINT) {
             parserPrint(token);
@@ -28,6 +35,10 @@ void interpret(char *input) {
         }else if(token->type == AST) {
             astEnabled = !astEnabled; // Change l'état d'affichage de l'AST
             printf("Affichage AST %s\n", astEnabled ? "active" : "desactive");
+        }else if(token->type == LBRACE) {
+            actualScope++;
+        }else if(token->type == RBRACE) {
+            actualScope--;
         }
 
         if (token->nextToken != NULL) token = token->nextToken;

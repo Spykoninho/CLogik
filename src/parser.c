@@ -11,6 +11,10 @@
 #include "../headers/AST.h"
 
 void parser(Token *input) {
+    if(input->type == RBRACE || input->type == LBRACE) {
+        if(input->nextToken != NULL) error("Erreur, syntaxe incorrecte");
+        return;
+    }
     while (input->nextToken != NULL) {
         if(input->type == UNKNOWN) error("unknown token");
 
