@@ -25,10 +25,11 @@ void parser(Token *input) {
 
             input = nextToken(input);
             if(input->type == TOKENSTRING) {
-                if(isOperator(input->nextToken->type)) {
+                if(input->nextToken != NULL && isOperator(input->nextToken->type)) {
                     input = checkCalcul(input);
                     break;
                 }
+
             }else {
                 input = checkCalcul(input);
                 break;
