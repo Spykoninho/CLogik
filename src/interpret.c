@@ -24,7 +24,6 @@ void interpret(char *input) {
         return;
     }
     while (token->nextToken != NULL) {
-        printToken(token);
         if (token->type == PRINT) {
             parserPrint(token);
         } else if (token->type == IDENTIFIER) {
