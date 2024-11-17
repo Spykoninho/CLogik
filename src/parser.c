@@ -434,7 +434,6 @@ double evaluateAST(ASTNode *node) {
                 }
             }
             actualScope--;
-            printf("Neoud WHILE : boucle terminee\n");
             return 0;
         }
 
