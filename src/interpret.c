@@ -24,13 +24,13 @@ void interpret(char *input) {
         return;
     }
     while (token->nextToken != NULL) {
+        printToken(token);
         if (token->type == PRINT) {
             parserPrint(token);
         } else if (token->type == IDENTIFIER) {
             const Token *tempToken = token->nextToken;
             if (tempToken->type == ASSIGN) {
                 addVariable(token);
-                printVariables(variables);
             }
         }else if(token->type == AST) {
             astEnabled = !astEnabled; // Change l'état d'affichage de l'AST
@@ -39,6 +39,13 @@ void interpret(char *input) {
             actualScope++;
         }else if(token->type == RBRACE) {
             actualScope--;
+        }else if (token->type == KEYWORD) {
+            if (strcmp(token->value,"while")== 0 ) {
+                parseWhile(&token);
+            }
+            if (token == NULL) {
+                break;
+            }
         }
 
         if (token->nextToken != NULL) token = token->nextToken;

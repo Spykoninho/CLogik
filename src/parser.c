@@ -46,7 +46,8 @@ void parser(Token *input) {
         }
         if (input->type == KEYWORD) {
             if (strcmp(input->value, "while") == 0) {
-                input = parseWhile(&input);
+                return;
+                // input = parseWhile(&input);
                 if (input == NULL) {
                     return;
                 }
@@ -402,9 +403,21 @@ double evaluateAST(ASTNode *node) {
             }
 
         case NODE_TYPE_PRINT:
-            double value = evaluateAST(node->print.expression);
-            printf("Valeur à imprimer : %g\n", value);
-            return value;
+            if (node->print.expression->type == NODE_TYPE_STRING) {
+                printf("%s\n", node->print.expression->variableName);
+            } else if (node->print.expression->type == NODE_TYPE_VARIABLE) {
+                Var *var = getVariable(variables, node->print.expression->variableName);
+                if (var->type == STRING) {
+                    printf("%s\n", var->value);
+                } else {
+                    printf("%g\n", atof(var->value));
+                }
+            } else {
+                double value = evaluateAST(node->print.expression);
+                printf("%g\n", value);
+            }
+        return 0;
+
 
         case NODE_TYPE_WHILE: {
             int iteration = 0;
