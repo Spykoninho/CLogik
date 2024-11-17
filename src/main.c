@@ -1,11 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
 #include "../headers/interpret.h"
 #include "../headers/variable.h"
-
-extern Var *variable;
 
 void interactive_mode() {
     char input[100];
@@ -36,6 +33,7 @@ void file_mode(const char *filename) {
 
     char line[100];
     while (fgets(line, sizeof(line), file)) {
+        if (strcmp(line, "\n") == 0) continue; // autorise les sauts de ligne
         interpret(line);
     }
 
