@@ -18,4 +18,5 @@ add_executable(CLogik src/main.c
         src/print.c
         headers/AST.h
         src/AST.c
+        src/condition.c
 )

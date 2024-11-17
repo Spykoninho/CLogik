@@ -68,7 +68,6 @@ void parser(Token *input) {
             input = nextToken(input);
             continue;
         }
-        printf("%s\n", input->value);
 
         if(input->type == IF) {
             input = nextToken(input);

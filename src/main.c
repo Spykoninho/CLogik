@@ -8,7 +8,7 @@ void interactive_mode() {
     char input[100];
     printf("Mode interactif : Entrez votre code (tapez 'q' pour quitter) :\n");
     do {
-        printf("> ");
+        printf("\n> ");
         fgets(input, 100, stdin);
         if (strcmp(input, "\n") == 0) continue; // autorise les sauts de ligne
         if (userWantsToQuit(input)) break;

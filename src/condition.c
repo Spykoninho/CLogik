@@ -41,7 +41,6 @@ void parserIf(Token *token) {
     if (conditionResult) {
         token = token->nextToken;
         if (token == NULL || token->nextToken->type != LBRACE) {
-            printf("%s\n", token->value);
             printf("Erreur il manque { apres le if\n");
             return;
         }

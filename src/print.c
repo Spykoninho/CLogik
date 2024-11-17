@@ -129,7 +129,7 @@ void parserPrint(Token *token) {
                 return;
             }
             double result = calcul(token);
-            printf("Result Print: %g\n", result);
+            printf("%g\n", result);
             return;
         }
     }
@@ -143,12 +143,12 @@ void parserPrint(Token *token) {
             }
             if(var->type == INT) {
                 int result = strtol(var->value, NULL, 10);
-                printf("Result Print: %d\n", result);
+                printf("%d\n", result);
             }else if(var->type == DOUBLE) {
                 double result = strtod(var->value, NULL);
-                printf("Result Print: %g\n", result);
+                printf("%g\n", result);
             }else {
-                printf("Result Print: %s\n", var->value);
+                printf("%s\n", var->value);
             }
             return;
         } else {
@@ -161,7 +161,7 @@ void parserPrint(Token *token) {
             printf("Error: missing ')' after print\n");
             return;
         }
-        printf("Result Print: %s\n", token->value);
+        printf("%s\n", token->value);
         return;
     }else if(token->type == NUMBER) {
         Token *tempToken = token->nextToken;
@@ -169,7 +169,7 @@ void parserPrint(Token *token) {
             printf("Error: missing ')' after print\n");
             return;
         }
-        printf("Result Print: %s\n", token->value);
+        printf("%s\n", token->value);
         return;
     }
 
