@@ -12,13 +12,17 @@ typedef enum {
     NODE_TYPE_PRINT,
     NODE_TYPE_OPERATION,
     NODE_TYPE_NUMBER,
-    NODE_TYPE_VARIABLE
+    NODE_TYPE_VARIABLE,
+    NODE_TYPE_ASSIGN,
+    NODE_TYPE_STRING,
 } NodeType;
 
 
 
 typedef struct ASTNode {
     NodeType type;
+    struct ASTNode * next;
+
     union {
         struct {  //calcul
             struct ASTNode *left;

@@ -42,18 +42,15 @@ void parser(Token *input) {
         }
         if (input->type == KEYWORD) {
             if (strcmp(input->value, "while") == 0) {
-                ASTNode *whileNode = parseWhile(&input);
-                evaluateAST(whileNode);
-                freeAST(whileNode); // Libère la mémoire
+                input = parseWhile(&input);
                 continue; // Passe à la prochaine instruction
+
             }
         }
-
         if(input->type == AST) {
             input = nextToken(input);
             continue;
         }
-
         printf("%s\n", input->value);
         error("Entree non prise en charge");
     }
@@ -74,37 +71,54 @@ Token *parseWhile(Token **currentToken) {
     }
 
     *currentToken = (*currentToken)->nextToken;
-    Token *startToken = *currentToken; // Début de la condition
+    ASTNode *condition = parseExpression(currentToken); // Parse condition
 
-    while ((*currentToken)->type != RPAREN) {
-        if (*currentToken == NULL) {
-            printf("Erreur : parenthèse droite manquante\n");
-            exit(1);
-        }
-        *currentToken = (*currentToken)->nextToken;
-    }
-
-    *currentToken = (*currentToken)->nextToken; // Passe la parenthèse droite
-
-    if ((*currentToken)->type != LBRACE) {
-        printf("Erreur : accolade gauche manquante pour le corps du 'while'\n");
+    if ((*currentToken)->type != RPAREN) {
+        printf("Erreur : parenthèse droite manquante après la condition\n");
         exit(1);
     }
 
-    *currentToken = (*currentToken)->nextToken; // Passe l'accolade gauche
+    *currentToken = (*currentToken)->nextToken;
 
-    while ((*currentToken)->type != RBRACE) {
-        if (*currentToken == NULL) {
-            printf("Erreur : accolade droite manquante\n");
-            exit(1);
-        }
-        *currentToken = (*currentToken)->nextToken;
+    ASTNode *body = parseBlock(currentToken); // Parse body
+
+    ASTNode *whileNode = malloc(sizeof(ASTNode)); // Allocation memoire
+    if (whileNode == NULL) { // Verification de nullite
+        printf("Erreur : allocation memoire echouee pour le noeud while\n");
+        exit(1);
     }
 
-    *currentToken = (*currentToken)->nextToken; // Passe l'accolade droite
+    whileNode->type = NODE_TYPE_WHILE;
+    validateNodeType(whileNode->type); // Valider que le type est correct
+    whileNode->controlFlow.condition = condition;
+    whileNode->controlFlow.body = body;
 
-    return startToken; // Retourne le premier token de la condition
+    if (condition == NULL) {
+        printf("Erreur : condition du noeud WHILE non definie\n");
+        exit(1);
+    }
+    if (body == NULL) {
+        printf("Erreur : corps du noeud WHILE non defini\n");
+        exit(1);
+    }
+
+    printf("Creation du noeud WHILE : condition = %p, body = %p\n", condition, body);
+
+
+    printf("Creation d'un noeud : type = %d (WHILE)\n", whileNode->type);
+
+    // evaluer immediatement le noeud while
+    evaluateAST(whileNode);
+
+    freeAST(whileNode); // Liberer la memoire après evaluation
+
+    return *currentToken;
 }
+
+
+
+
+
 
 
 
@@ -114,19 +128,33 @@ ASTNode *parseExpression(Token **currentToken) {
     if (isOperator((*currentToken)->type)) {
         char operator = (*currentToken)->value[0];
         *currentToken = (*currentToken)->nextToken;
+
         ASTNode *right = parseExpression(currentToken);
 
         ASTNode *operationNode = malloc(sizeof(ASTNode));
         if (operationNode == NULL) {
-            printf("Erreur : allocation mémoire échouée pour le nœud d'opération\n");
+            printf("Erreur : allocation memoire echouee pour le noeud OPERATION\n");
             exit(1);
         }
 
-        operationNode->type = NODE_TYPE_OPERATION; // Affecte explicitement le type
+        operationNode->type = NODE_TYPE_OPERATION;
         operationNode->operation.operator = operator;
         operationNode->operation.left = left;
         operationNode->operation.right = right;
 
+        if (left == NULL) {
+            printf("Erreur : sous-expression gauche invalide\n");
+            exit(1);
+        }
+        if (isOperator((*currentToken)->type)) {
+            if (right == NULL) {
+                printf("Erreur : sous-expression droite invalide\n");
+                exit(1);
+            }
+        }
+
+
+        printf("Creation d'un noeud : type = %d (OPERATION)\n", operationNode->type); // Debug
         return operationNode;
     }
 
@@ -134,12 +162,24 @@ ASTNode *parseExpression(Token **currentToken) {
 }
 
 
+
 void validateNodeType(NodeType type) {
-    if (type < NODE_TYPE_IF || type > NODE_TYPE_VARIABLE) {
-        printf("Erreur : type de nœud invalide (%d) détecté lors de la création\n", type);
+    // Ajoutez tous les types definis dans l'enum NodeType
+    switch (type) {
+        case NODE_TYPE_NUMBER:
+        case NODE_TYPE_VARIABLE:
+        case NODE_TYPE_OPERATION:
+        case NODE_TYPE_IF:
+        case NODE_TYPE_WHILE:
+        case NODE_TYPE_PRINT:
+        case NODE_TYPE_ASSIGN:
+            return; // Type valide
+        default:
+            printf("Erreur : type de noeud invalide (%d) detecte\n", type);
         exit(1);
     }
 }
+
 
 
 
@@ -153,13 +193,25 @@ ASTNode *parseBlock(Token **currentToken) {
 
     ASTNode *block = NULL; // Liste des instructions dans le bloc
     while ((*currentToken)->type != RBRACE) {
+        if (*currentToken == NULL) {
+            error("Accolade droite manquante pour le bloc");
+        }
+
         ASTNode *statement = parseStatement(currentToken); // Analyse une instruction
         block = addToBlock(block, statement); // Ajoute l'instruction au bloc
-        *currentToken = (*currentToken)->nextToken;
+        printf("Création d'un nœud dans le bloc : type = %d\n", statement->type);
+
+        if ((*currentToken)->type == SEMICOLON) {
+            *currentToken = (*currentToken)->nextToken; // Passe le point-virgule
+        }
     }
 
+    *currentToken = (*currentToken)->nextToken; // Passe l'accolade droite
     return block;
 }
+
+
+
 
 
 ASTNode *parseStatement(Token **currentToken) {
@@ -167,6 +219,9 @@ ASTNode *parseStatement(Token **currentToken) {
         printf("Erreur : token NULL dans parseStatement\n");
         exit(1);
     }
+
+    // Gestion des identifiants (ex : x = 5)
+
 
     if ((*currentToken)->type == IDENTIFIER) {
         Token *varToken = *currentToken;
@@ -184,27 +239,34 @@ ASTNode *parseStatement(Token **currentToken) {
 
         // Crée un nœud pour l'assignation
         ASTNode *assignNode = malloc(sizeof(ASTNode));
-        assignNode->type = NODE_TYPE_VARIABLE;
+        if (!assignNode) {
+            printf("Erreur : allocation mémoire échouée pour le nœud ASSIGN\n");
+            exit(1);
+        }
+        assignNode->type = NODE_TYPE_ASSIGN;
         assignNode->variableName = strdup(varToken->value);
-        assignNode->operation.left = valueNode;
+        assignNode->operation.right = valueNode;
+
+        printf("Création d'un nœud : type = %d (ASSIGN)\n", assignNode->type);
 
         return assignNode;
     }
 
 
-    if ((*currentToken)->type == KEYWORD) {
-        if (strcmp((*currentToken)->value, "while") == 0) {
-            return parseWhile(currentToken);
-        }
+    // Gestion des instructions `while`
+    if ((*currentToken)->type == KEYWORD && strcmp((*currentToken)->value, "while") == 0) {
+        return parseWhile(currentToken);
     }
 
+    // Gestion des instructions `print`
     if ((*currentToken)->type == PRINT) {
-        // Gestion d'un `print`
-        *currentToken = (*currentToken)->nextToken; // Passe le mot-clé `print`
+        *currentToken = (*currentToken)->nextToken; // Passe le mot-cle `print`
         ASTNode *expression = parseExpression(currentToken);
         ASTNode *printNode = malloc(sizeof(ASTNode));
         printNode->type = NODE_TYPE_PRINT;
         printNode->print.expression = expression;
+
+        printf("Creation d'un noeud : type = %d (PRINT)\n", printNode->type);
 
         return printNode;
     }
@@ -214,116 +276,185 @@ ASTNode *parseStatement(Token **currentToken) {
 }
 
 
+
 ASTNode *addToBlock(ASTNode *block, ASTNode *statement) {
     if (block == NULL) {
-        // Si le bloc est vide, initialise-le avec la première instruction
+        validateNodeType(statement->type); // Validation du type
         return statement;
     }
 
-    // Si le bloc existe déjà, ajoute l'instruction à la fin
     ASTNode *current = block;
-    while (current->operation.right != NULL) {
-        current = current->operation.right;
+    while (current->next != NULL) { // Parcourt jusqu'au dernier nœud
+        current = current->next;
     }
-    current->operation.right = statement;
+    current->next = statement; // Ajoute l'instruction à la fin du bloc
+
+    validateNodeType(statement->type); // Validation du type
     return block;
 }
 
 
+
+
 double evaluateAST(ASTNode *node) {
     if (node == NULL) {
-        printf("Erreur : nœud AST NULL\n");
-        return 0;
+        printf("Erreur critique : noeud AST NULL detecte dans evaluateAST\n");
+        exit(1);
     }
 
+    printf("Debut de l'evaluation du noeud : type = %d\n", node->type);
+
     switch (node->type) {
+
+         case NODE_TYPE_ASSIGN: {
+            printf("Nœud ASSIGN : %s = ...\n", node->variableName);
+
+            // Évalue l'expression sur le côté droit
+            double value = 0.0;
+            char *stringValue = NULL;
+
+            if (node->operation.right->type == NODE_TYPE_STRING) {
+                stringValue = node->operation.right->variableName;
+            } else {
+                value = evaluateAST(node->operation.right);
+            }
+
+            // Vérifie si la variable existe déjà
+            Var *var = getVariable(variables, node->variableName);
+            if (!var) {
+                // Si la variable n'existe pas, crée une nouvelle
+                var = malloc(sizeof(Var));
+                if (!var) {
+                    printf("Erreur : allocation mémoire échouée pour la variable\n");
+                    exit(1);
+                }
+                var->name = strdup(node->variableName);
+                var->nextVar = variables;
+                variables = var; // Ajoute à la liste des variables
+            } else {
+                // Libère l'ancienne valeur
+                free(var->value);
+            }
+
+            // Met à jour le type et la valeur de la variable
+            if (stringValue) {
+                var->type = STRING;
+                var->value = strdup(stringValue);
+                printf("Variable '%s' mise à jour : valeur = \"%s\" (STRING)\n", var->name, var->value);
+            } else {
+                if ((double)((int)value) == value) {
+                    var->type = INT;
+                    var->value = malloc(32); // Alloue la mémoire pour la chaîne
+                    if (!var->value) {
+                        printf("Erreur : allocation mémoire échouée pour la valeur\n");
+                        exit(1);
+                    }
+                    sprintf(var->value, "%d", (int)value);
+                    printf("Variable '%s' mise à jour : valeur = %d (INT)\n", var->name, (int)value);
+                } else {
+                    var->type = DOUBLE;
+                    var->value = malloc(32); // Alloue la mémoire pour la chaîne
+                    if (!var->value) {
+                        printf("Erreur : allocation mémoire échouée pour la valeur\n");
+                        exit(1);
+                    }
+                    sprintf(var->value, "%g", value);
+                    printf("Variable '%s' mise à jour : valeur = %g (DOUBLE)\n", var->name, value);
+                }
+            }
+
+            return value; // Retourne la valeur assignée (utile pour les chaînes si nécessaire)
+        }
+
+
+        case NODE_TYPE_STRING:
+            printf("Nœud STRING avec valeur = %s\n", node->variableName);
+            return 0; // Si vous n'avez pas besoin d'un retour numérique
+
+
         case NODE_TYPE_NUMBER:
+            printf("Noeud NUMBER avec valeur = %g\n", node->number);
             return node->number;
 
         case NODE_TYPE_VARIABLE: {
-            // Gestion des variables avec assignation
-            if (node->operation.left) { // C'est une assignation (x = ...)
-                double value = evaluateAST(node->operation.left);
-                Var *var = getVariable(variables, node->variableName);
-                if (var) {
-                    // Met à jour la valeur existante
-                    free(var->value);
-                    var->value = malloc(32); // Alloue suffisamment de mémoire
-                    sprintf(var->value, "%g", value);
-                } else {
-                    // Crée une nouvelle variable
-                    var = malloc(sizeof(Var));
-                    var->type = DOUBLE; // Suppose que c'est un double
-                    var->name = strdup(node->variableName);
-                    var->value = malloc(32);
-                    sprintf(var->value, "%g", value);
-                    var->nextVar = variables;
-                    variables = var;
-                }
-                return value;
-            }
-
-            // Si ce n'est pas une assignation, retourne la valeur de la variable
+            printf("Noeud VARIABLE : nom = %s\n", node->variableName);
             Var *var = getVariable(variables, node->variableName);
             if (!var) {
-                printf("Erreur : variable '%s' non définie\n", node->variableName);
+                printf("Erreur : variable '%s' non définie dans le contexte\n", node->variableName);
                 exit(1);
             }
-            return atof(var->value);
+            if (var->type == STRING) {
+                printf("Valeur de la variable '%s' : \"%s\" (STRING)\n", var->name, var->value);
+                return 0; // Les chaînes ne sont pas évaluées comme des nombres
+            } else {
+                printf("Valeur de la variable '%s' : %s (%s)\n", var->name, var->value, getVarType(var->type));
+                return atof(var->value);
+            }
         }
 
-        case NODE_TYPE_OPERATION: {
+        case NODE_TYPE_OPERATION:
+            if (node->operation.left == NULL || node->operation.right == NULL) {
+                printf("Erreur : noeud OPERATION a des sous-noeuds NULL\n");
+                exit(1);
+            }
+            printf("evaluation OPERATION : operateur = '%c'\n", node->operation.operator);
             double leftValue = evaluateAST(node->operation.left);
             double rightValue = evaluateAST(node->operation.right);
+            printf("Resultats : gauche = %g, droite = %g\n", leftValue, rightValue);
+            // Ajoute un switch pour l'operateur
             switch (node->operation.operator) {
                 case '+': return leftValue + rightValue;
                 case '-': return leftValue - rightValue;
                 case '*': return leftValue * rightValue;
                 case '/':
                     if (rightValue == 0) {
-                        printf("Erreur : division par zéro\n");
-                        return 0;
+                        printf("Erreur : division par zero\n");
+                        exit(1);
                     }
-                return leftValue / rightValue;
-                case '>': return leftValue > rightValue; // Support de '>'
+                    return leftValue / rightValue;
+                case '>': return leftValue > rightValue;
                 case '<': return leftValue < rightValue;
                 case '=': return leftValue == rightValue;
-                case '!': return leftValue != rightValue;
                 default:
-                    printf("Erreur : opérateur inconnu '%c'\n", node->operation.operator);
-                return 0;
+                    printf("Erreur : operateur inconnu '%c'\n", node->operation.operator);
+                    exit(1);
             }
-        }
 
-        case NODE_TYPE_IF:
-            if (evaluateAST(node->controlFlow.condition)) {
-                return evaluateAST(node->controlFlow.body);
-            } else if (node->controlFlow.elseBody) {
-                return evaluateAST(node->controlFlow.elseBody);
-            }
-            return 0;
+        case NODE_TYPE_PRINT:
+            printf("Neoud PRINT : evaluation de l'expression\n");
+            double value = evaluateAST(node->print.expression);
+            printf("Valeur à imprimer : %g\n", value);
+            return value;
 
         case NODE_TYPE_WHILE: {
-            double result = 0;
+            printf("Neoud WHILE : debut de la boucle\n");
+            int iteration = 0;
             while (evaluateAST(node->controlFlow.condition)) {
-                result = evaluateAST(node->controlFlow.body);
+                iteration++;
+                printf("WHILE : Début de l'itération %d\n", iteration);
+
+                // Parcourt et évalue tous les nœuds du corps
+                ASTNode *current = node->controlFlow.body;
+                while (current) {
+                    evaluateAST(current); // Évalue chaque instruction
+                    current = current->next; // Passe au nœud suivant dans le bloc
+                }
+
+                printf("WHILE : Fin de l'itération %d\n", iteration);
             }
-            return result;
+            printf("Neoud WHILE : boucle terminee\n");
+            return 0;
         }
 
-        case NODE_TYPE_PRINT: {
-            double value = evaluateAST(node->print.expression);
-            printf("Impression : %g\n", value);
-            return value;
-        }
+
 
         default:
-            printf("Erreur : type de nœud inconnu\n");
-            printf("Type de nœud : %d\n", node->type); // Ajoute ceci pour afficher le type du nœud
+            printf("Erreur critique : type de neoud inconnu (%d)\n", node->type);
             exit(1);
-
     }
 }
+
+
 
 
 ASTNode *createVariableOrNumberNode(Token **currentToken) {
@@ -332,35 +463,27 @@ ASTNode *createVariableOrNumberNode(Token **currentToken) {
         exit(1);
     }
 
-    ASTNode *node = NULL;
+    ASTNode *node = malloc(sizeof(ASTNode));
+    if (node == NULL) {
+        printf("Erreur : allocation memoire echouee pour le noeud AST\n");
+        exit(1);
+    }
 
     if ((*currentToken)->type == IDENTIFIER) {
-        // Crée un nœud pour une variable
-        node = malloc(sizeof(ASTNode));
-        if (node == NULL) {
-            printf("Erreur d'allocation mémoire pour le nœud AST\n");
-            exit(1);
-        }
         node->type = NODE_TYPE_VARIABLE;
         node->variableName = strdup((*currentToken)->value);
-
-    } else if ((*currentToken)->type == NUMBER) {
-        // Crée un nœud pour un nombre
-        node = malloc(sizeof(ASTNode));
-        if (node == NULL) {
-            printf("Erreur d'allocation mémoire pour le nœud AST\n");
-            exit(1);
+    } else if((*currentToken)->type == TOKENSTRING){
+            node->type = NODE_TYPE_STRING;
+            node->variableName = strdup((*currentToken)->value);
         }
+    else if ((*currentToken)->type == NUMBER) {
         node->type = NODE_TYPE_NUMBER;
         node->number = atof((*currentToken)->value);
-
     } else if ((*currentToken)->type == LPAREN) {
-        // Gère une expression entre parenthèses
         *currentToken = (*currentToken)->nextToken; // Passe la parenthèse gauche
-        node = parseExpression(currentToken);       // Analyse l'expression dans les parenthèses
-
+        node = parseExpression(currentToken);       // Analyse l'expression entre parenthèses
         if ((*currentToken)->type != RPAREN) {
-            printf("Erreur : parenthèse droite manquante dans l'expression\n");
+            printf("Erreur : parenthèse droite manquante\n");
             exit(1);
         }
     } else {
@@ -369,11 +492,13 @@ ASTNode *createVariableOrNumberNode(Token **currentToken) {
         exit(1);
     }
 
-    // Passe au prochain token
-    *currentToken = (*currentToken)->nextToken;
-
+    printf("Creation d'un noeud : type = %d\n", node->type); // Debug
+    *currentToken = (*currentToken)->nextToken; // Passe au prochain token
     return node;
 }
+
+
+
 
 void error(char *msg) {
     printf("%s\n", msg);
@@ -396,7 +521,7 @@ Token * checkCalcul(Token *input) {
         }
         if(modulo2 % 2 == 0 && isOperator(input->type)) error("Operateur dans le mauvais ordre");
         if(modulo2 % 2 == 1 && (input->type == IDENTIFIER || input->type == NUMBER || input->type==TOKENSTRING)) error("Operandes dans le mauvais ordre");
-        if(input->type != IDENTIFIER && input->type != NUMBER && !isOperator(input->type) && input->type!=TOKENSTRING) error("Mauvais type de donnée dans le calcul");
+        if(input->type != IDENTIFIER && input->type != NUMBER && !isOperator(input->type) && input->type!=TOKENSTRING) error("Mauvais type de donnee dans le calcul");
         input = nextToken(input);
         modulo2++;
     }
@@ -444,7 +569,7 @@ Token * checkPrint(Token *input) {
         }
         if(modulo2 % 2 == 0 && isOperator(input->type)) error("Operateur dans le mauvais ordre");
         if(modulo2 % 2 == 1 && (input->type == IDENTIFIER || input->type == NUMBER || input->type==TOKENSTRING)) error("Operandes dans le mauvais ordre");
-        if(input->type != IDENTIFIER && input->type != NUMBER && !isOperator(input->type) && input->type!=TOKENSTRING) error("Mauvais type de donnée dans le calcul");
+        if(input->type != IDENTIFIER && input->type != NUMBER && !isOperator(input->type) && input->type!=TOKENSTRING) error("Mauvais type de donnee dans le calcul");
         input = nextToken(input);
         modulo2++;
     }

@@ -270,7 +270,7 @@ Var *getVariable(Var *var, char *searchedVar) {
     }
     printf("La variable %s n'existe pas.", searchedVar);
     freeVariable(var);
-    exit(0);
+    return NULL;
 }
 
 // printVariables
