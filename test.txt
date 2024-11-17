@@ -1,6 +1,2 @@
-a=2;
-{
-b=3;
-}
-print(a);
-print(b);
+x = 5;
+while(x>3){i = 1;print(i); x = x-1;}
