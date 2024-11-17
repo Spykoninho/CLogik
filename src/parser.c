@@ -60,47 +60,6 @@ void parser(Token *input) {
     if(strcmp(input->value, ";") != 0) error("; manquant");
 }
 
-
-Token *parseIf(Token **currentToken) {
-    *currentToken = (*currentToken)->nextToken; // Passe le mot-clé `if`
-
-    if ((*currentToken)->type != LPAREN) {
-        error("Parenthèse gauche manquante après 'if'");
-    }
-
-    // Parse la condition
-    *currentToken = (*currentToken)->nextToken;
-    ASTNode *condition = parseExpression(currentToken); // Fonction pour analyser une expression
-
-    if ((*currentToken)->type != RPAREN) {
-        error("Parenthèse droite manquante après la condition");
-    }
-
-    // Parse le corps du `if`
-    *currentToken = (*currentToken)->nextToken;
-    ASTNode *body = parseBlock(currentToken); // Fonction pour analyser un bloc entre accolades
-
-    // Parse le bloc `else` optionnel
-    ASTNode *elseBody = NULL;
-    if ((*currentToken)->type == KEYWORD && strcmp((*currentToken)->value, "else") == 0) {
-        *currentToken = (*currentToken)->nextToken;
-        elseBody = parseBlock(currentToken);
-    }
-
-    // Crée le nœud `if`
-    ASTNode *ifNode = malloc(sizeof(ASTNode));
-    ifNode->type = NODE_TYPE_IF;
-    ifNode->controlFlow.condition = condition;
-    ifNode->controlFlow.body = body;
-    ifNode->controlFlow.elseBody = elseBody;
-
-    // Évalue l'AST immédiatement
-    evaluateAST(ifNode);
-
-    freeAST(ifNode); // Libère la mémoire après l'exécution
-    return *currentToken;
-}
-
 Token *parseWhile(Token **currentToken) {
     if ((*currentToken)->type != KEYWORD || strcmp((*currentToken)->value, "while") != 0) {
         printf("Erreur : 'while' attendu\n");
@@ -234,9 +193,7 @@ ASTNode *parseStatement(Token **currentToken) {
 
 
     if ((*currentToken)->type == KEYWORD) {
-        if (strcmp((*currentToken)->value, "if") == 0) {
-            return parseIf(currentToken);
-        } else if (strcmp((*currentToken)->value, "while") == 0) {
+        if (strcmp((*currentToken)->value, "while") == 0) {
             return parseWhile(currentToken);
         }
     }

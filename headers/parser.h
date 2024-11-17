@@ -22,10 +22,6 @@ void checkParentheses(Token *input);
 
 Token * checkPrint(Token *input);
 
-
-// Analyse un nœud de type `if` et retourne le prochain token
-Token *parseIf(Token **currentToken);
-
 // Analyse un nœud de type `while` et retourne le prochain token
 Token *parseWhile(Token **currentToken);
 

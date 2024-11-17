@@ -12,7 +12,6 @@ void interactive_mode() {
         fgets(input, 100, stdin);
         if (strcmp(input, "\n") == 0) continue; // autorise les sauts de ligne
         if (userWantsToQuit(input)) break;
-        // Vérifie si la commande est "AST"
         interpret(input);
     } while (!userWantsToQuit(input));
 }
