@@ -97,7 +97,7 @@ void parserPrint(Token *token) {
             printf("%s\n", printedString);
             free(printedString);
             return;
-        }else{
+        } else {
             // Traitement des calculs avec des nombres
             Token *tempTokenCalcul = token;
             while (tempTokenCalcul != NULL && tempTokenCalcul->type != RPAREN) {
@@ -141,13 +141,13 @@ void parserPrint(Token *token) {
                 printf("Error: missing ')' after print\n");
                 return;
             }
-            if(var->type == INT) {
+            if (var->type == INT) {
                 int result = strtol(var->value, NULL, 10);
                 printf("%d\n", result);
-            }else if(var->type == DOUBLE) {
+            } else if (var->type == DOUBLE) {
                 double result = strtod(var->value, NULL);
                 printf("%g\n", result);
-            }else {
+            } else {
                 printf("%s\n", var->value);
             }
             return;
@@ -155,7 +155,7 @@ void parserPrint(Token *token) {
             printf("Erreur : la variable n'existe pas\n");
             return;
         }
-    }else if (token->type == TOKENSTRING){
+    } else if (token->type == TOKENSTRING) {
         Token *tempToken = token->nextToken;
         if (tempToken == NULL || tempToken->type != RPAREN) {
             printf("Error: missing ')' after print\n");
@@ -163,7 +163,7 @@ void parserPrint(Token *token) {
         }
         printf("%s\n", token->value);
         return;
-    }else if(token->type == NUMBER) {
+    } else if (token->type == NUMBER) {
         Token *tempToken = token->nextToken;
         if (tempToken == NULL || tempToken->type != RPAREN) {
             printf("Error: missing ')' after print\n");

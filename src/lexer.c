@@ -116,7 +116,7 @@ Token *lexer(char *string, Token *token) {
             }
             if (strcmp(longString, "AST") == 0) {
                 token = addToken(token, AST, longString);
-            }else if (strcmp(longString, "print") == 0) {
+            } else if (strcmp(longString, "print") == 0) {
                 token = addToken(token, PRINT, longString);
             } else if (strcmp(longString, "while") == 0) {
                 token = addToken(token, KEYWORD, longString); // Ajoute le mot-clé "while"

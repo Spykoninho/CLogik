@@ -17,11 +17,11 @@ void interpret(char *input) {
     int condition = 0;
 
     parser(token);
-    if(token->type == LBRACE) {
+    if (token->type == LBRACE) {
         actualScope++;
         return;
     }
-    if(token->type == RBRACE) {
+    if (token->type == RBRACE) {
         actualScope--;
         return;
     }
@@ -33,25 +33,23 @@ void interpret(char *input) {
             if (tempToken->type == ASSIGN) {
                 addVariable(token);
             }
-        }else if(token->type == AST) {
+        } else if (token->type == AST) {
             astEnabled = !astEnabled; // Change l'état d'affichage de l'AST
             printf("Affichage AST %s\n", astEnabled ? "active" : "desactive");
-        }else if(token->type == LBRACE) {
+        } else if (token->type == LBRACE) {
             actualScope++;
-        }else if(token->type == RBRACE) {
+        } else if (token->type == RBRACE) {
             actualScope--;
-        }else if (token->type == KEYWORD) {
-            if (strcmp(token->value,"while")== 0 ) {
+        } else if (token->type == KEYWORD) {
+            if (strcmp(token->value, "while") == 0) {
                 parseWhile(&token);
             }
             if (token == NULL) {
                 break;
             }
-        }
-        else if (token->type == IF) {
+        } else if (token->type == IF) {
             condition = 1;
             parserIf(token);
-
         }
 
         if (token->nextToken != NULL) token = token->nextToken;

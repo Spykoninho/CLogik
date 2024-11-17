@@ -11,7 +11,7 @@
 #include "../headers/AST.h"
 #include "../headers/condition.h"
 
-Token* checkBlock(Token* input) {
+Token *checkBlock(Token *input) {
     while (input != NULL && input->type != RBRACE) {
         input = nextToken(input);
     }
@@ -19,37 +19,36 @@ Token* checkBlock(Token* input) {
 }
 
 void parser(Token *input) {
-    if(input->type == RBRACE || input->type == LBRACE) {
-        if(input->nextToken != NULL) error("Erreur, syntaxe incorrecte");
+    if (input->type == RBRACE || input->type == LBRACE) {
+        if (input->nextToken != NULL) error("Erreur, syntaxe incorrecte");
         return;
     }
     while (input->nextToken != NULL) {
-        if(input->type == UNKNOWN) error("unknown token");
+        if (input->type == UNKNOWN) error("unknown token");
 
-        if(input->type == IDENTIFIER) {
+        if (input->type == IDENTIFIER) {
             input = nextToken(input);
-            if(input->type != ASSIGN)
+            if (input->type != ASSIGN)
                 error("Assignation manquante.");
 
             input = nextToken(input);
-            if(input->type == TOKENSTRING) {
-                if(input->nextToken != NULL && isOperator(input->nextToken->type)) {
+            if (input->type == TOKENSTRING) {
+                if (input->nextToken != NULL && isOperator(input->nextToken->type)) {
                     input = checkCalcul(input);
                     break;
                 }
-
-            }else {
+            } else {
                 input = checkCalcul(input);
                 break;
             }
             input = nextToken(input);
             break;
         }
-        if(input->type == PRINT) {
+        if (input->type == PRINT) {
             input = nextToken(input);
-            if(input->type != LPAREN) error("Parentheses gauche manquante");
+            if (input->type != LPAREN) error("Parentheses gauche manquante");
             input = checkPrint(input);
-            if(input->type != RPAREN) error("Parentheses droite manquante");
+            if (input->type != RPAREN) error("Parentheses droite manquante");
             input = nextToken(input);
             break;
         }
@@ -61,24 +60,23 @@ void parser(Token *input) {
                     return;
                 }
                 continue; // Passe à la prochaine instruction
-
             }
         }
-        if(input->type == AST) {
+        if (input->type == AST) {
             input = nextToken(input);
             continue;
         }
 
-        if(input->type == IF) {
+        if (input->type == IF) {
             input = nextToken(input);
-            if(input->type != LPAREN) error("Parenthese gauche manquante pour le 'if'");
+            if (input->type != LPAREN) error("Parenthese gauche manquante pour le 'if'");
 
             input = checkIf(input);
-            if(input->type != LBRACE) error("Accolade gauche manquante après la condition du 'if'");
+            if (input->type != LBRACE) error("Accolade gauche manquante après la condition du 'if'");
 
             input = checkBlock(input);
 
-            if(input->type != RBRACE) error("Accolade droite manquante après le bloc du 'if'");
+            if (input->type != RBRACE) error("Accolade droite manquante après le bloc du 'if'");
 
             input = nextToken(input);
             break;
@@ -86,7 +84,7 @@ void parser(Token *input) {
 
         error("Entree non prise en charge");
     }
-    if(strcmp(input->value, ";") != 0 && strcmp(input->value, "}") != 0) error("; manquant");
+    if (strcmp(input->value, ";") != 0 && strcmp(input->value, "}") != 0) error("; manquant");
 }
 
 Token *parseWhile(Token **currentToken) {
@@ -115,7 +113,8 @@ Token *parseWhile(Token **currentToken) {
     ASTNode *body = parseBlock(currentToken); // Parse body
 
     ASTNode *whileNode = malloc(sizeof(ASTNode)); // Allocation memoire
-    if (whileNode == NULL) { // Verification de nullite
+    if (whileNode == NULL) {
+        // Verification de nullite
         printf("Erreur : allocation memoire echouee pour le noeud while\n");
         exit(1);
     }
@@ -141,12 +140,6 @@ Token *parseWhile(Token **currentToken) {
 
     return *currentToken;
 }
-
-
-
-
-
-
 
 
 ASTNode *parseExpression(Token **currentToken) {
@@ -187,7 +180,6 @@ ASTNode *parseExpression(Token **currentToken) {
 }
 
 
-
 void validateNodeType(NodeType type) {
     // Ajoutez tous les types definis dans l'enum NodeType
     switch (type) {
@@ -201,12 +193,9 @@ void validateNodeType(NodeType type) {
             return; // Type valide
         default:
             printf("Erreur : type de noeud invalide (%d) detecte\n", type);
-        exit(1);
+            exit(1);
     }
 }
-
-
-
 
 
 ASTNode *parseBlock(Token **currentToken) {
@@ -234,9 +223,6 @@ ASTNode *parseBlock(Token **currentToken) {
     *currentToken = (*currentToken)->nextToken; // Passe l'accolade droite
     return block;
 }
-
-
-
 
 
 ASTNode *parseStatement(Token **currentToken) {
@@ -297,7 +283,6 @@ ASTNode *parseStatement(Token **currentToken) {
 }
 
 
-
 ASTNode *addToBlock(ASTNode *block, ASTNode *statement) {
     if (block == NULL) {
         validateNodeType(statement->type); // Validation du type
@@ -305,7 +290,8 @@ ASTNode *addToBlock(ASTNode *block, ASTNode *statement) {
     }
 
     ASTNode *current = block;
-    while (current->next != NULL) { // Parcourt jusqu'au dernier nœud
+    while (current->next != NULL) {
+        // Parcourt jusqu'au dernier nœud
         current = current->next;
     }
     current->next = statement; // Ajoute l'instruction à la fin du bloc
@@ -315,8 +301,6 @@ ASTNode *addToBlock(ASTNode *block, ASTNode *statement) {
 }
 
 
-
-
 double evaluateAST(ASTNode *node) {
     if (node == NULL) {
         printf("Erreur critique : noeud AST NULL detecte dans evaluateAST\n");
@@ -324,8 +308,7 @@ double evaluateAST(ASTNode *node) {
     }
 
     switch (node->type) {
-
-         case NODE_TYPE_ASSIGN: {
+        case NODE_TYPE_ASSIGN: {
             // Évalue l'expression sur le côté droit
             double value = 0.0;
             char *stringValue = NULL;
@@ -337,7 +320,7 @@ double evaluateAST(ASTNode *node) {
             }
 
             // Vérifie si la variable existe déjà
-             Var * var = malloc(sizeof(Var));
+            Var *var = malloc(sizeof(Var));
             if (!isVarExists(variables, node->variableName)) {
                 // Si la variable n'existe pas, crée une nouvelle
                 if (!var) {
@@ -348,8 +331,7 @@ double evaluateAST(ASTNode *node) {
                 var->name = strdup(node->variableName);
                 var->nextVar = variables;
                 variables = var; // Ajoute à la liste des variables
-
-            }else {
+            } else {
                 var = getVariable(variables, node->variableName);
             }
             // Met à jour le type et la valeur de la variable
@@ -357,14 +339,14 @@ double evaluateAST(ASTNode *node) {
                 var->type = STRING;
                 var->value = strdup(stringValue);
             } else {
-                if ((double)((int)value) == value) {
+                if ((double) ((int) value) == value) {
                     var->type = INT;
                     var->value = malloc(32); // Alloue la mémoire pour la chaîne
                     if (!var->value) {
                         printf("Erreur : allocation mémoire échouée pour la valeur\n");
                         exit(1);
                     }
-                    sprintf(var->value, "%d", (int)value);
+                    sprintf(var->value, "%d", (int) value);
                 } else {
                     var->type = DOUBLE;
                     var->value = malloc(32); // Alloue la mémoire pour la chaîne
@@ -407,7 +389,7 @@ double evaluateAST(ASTNode *node) {
             }
             double leftValue = evaluateAST(node->operation.left);
             double rightValue = evaluateAST(node->operation.right);
-            // Ajoute un switch pour l'operateur
+        // Ajoute un switch pour l'operateur
             switch (node->operation.operator) {
                 case '+': return leftValue + rightValue;
                 case '-': return leftValue - rightValue;
@@ -440,7 +422,7 @@ double evaluateAST(ASTNode *node) {
                 double value = evaluateAST(node->print.expression);
                 printf("%g\n", value);
             }
-        return 0;
+            return 0;
 
 
         case NODE_TYPE_WHILE: {
@@ -461,14 +443,11 @@ double evaluateAST(ASTNode *node) {
         }
 
 
-
         default:
             printf("Erreur critique : type de neoud inconnu (%d)\n", node->type);
             exit(1);
     }
 }
-
-
 
 
 ASTNode *createVariableOrNumberNode(Token **currentToken) {
@@ -486,16 +465,15 @@ ASTNode *createVariableOrNumberNode(Token **currentToken) {
     if ((*currentToken)->type == IDENTIFIER) {
         node->type = NODE_TYPE_VARIABLE;
         node->variableName = strdup((*currentToken)->value);
-    } else if((*currentToken)->type == TOKENSTRING){
-            node->type = NODE_TYPE_STRING;
-            node->variableName = strdup((*currentToken)->value);
-        }
-    else if ((*currentToken)->type == NUMBER) {
+    } else if ((*currentToken)->type == TOKENSTRING) {
+        node->type = NODE_TYPE_STRING;
+        node->variableName = strdup((*currentToken)->value);
+    } else if ((*currentToken)->type == NUMBER) {
         node->type = NODE_TYPE_NUMBER;
         node->number = atof((*currentToken)->value);
     } else if ((*currentToken)->type == LPAREN) {
         *currentToken = (*currentToken)->nextToken; // Passe la parenthèse gauche
-        node = parseExpression(currentToken);       // Analyse l'expression entre parenthèses
+        node = parseExpression(currentToken); // Analyse l'expression entre parenthèses
         if ((*currentToken)->type != RPAREN) {
             printf("Erreur : parenthèse droite manquante\n");
             exit(1);
@@ -511,30 +489,30 @@ ASTNode *createVariableOrNumberNode(Token **currentToken) {
 }
 
 
-
-
 void error(char *msg) {
     printf("%s\n", msg);
     exit(1);
 }
 
-Token * nextToken(Token *input) {
-    input=input->nextToken;
-    if(input == NULL) error("Ligne non finie correctement");
+Token *nextToken(Token *input) {
+    input = input->nextToken;
+    if (input == NULL) error("Ligne non finie correctement");
     return input;
 }
 
-Token * checkCalcul(Token *input) {
+Token *checkCalcul(Token *input) {
     checkParentheses(input);
     int modulo2 = 0;
     while (input->nextToken != NULL) {
-        if(input->type == LPAREN || input->type == RPAREN) {
-            input=nextToken(input);
+        if (input->type == LPAREN || input->type == RPAREN) {
+            input = nextToken(input);
             continue;
         }
-        if(modulo2 % 2 == 0 && isOperator(input->type)) error("Operateur dans le mauvais ordre");
-        if(modulo2 % 2 == 1 && (input->type == IDENTIFIER || input->type == NUMBER || input->type==TOKENSTRING)) error("Operandes dans le mauvais ordre");
-        if(input->type != IDENTIFIER && input->type != NUMBER && !isOperator(input->type) && input->type!=TOKENSTRING) error("Mauvais type de donnee dans le calcul");
+        if (modulo2 % 2 == 0 && isOperator(input->type)) error("Operateur dans le mauvais ordre");
+        if (modulo2 % 2 == 1 && (input->type == IDENTIFIER || input->type == NUMBER || input->type == TOKENSTRING))
+            error("Operandes dans le mauvais ordre");
+        if (input->type != IDENTIFIER && input->type != NUMBER && !isOperator(input->type) && input->type !=
+            TOKENSTRING) error("Mauvais type de donnee dans le calcul");
         input = nextToken(input);
         modulo2++;
     }
@@ -545,39 +523,41 @@ void checkParentheses(Token *input) {
     int parentheseCheck = 0;
     int crochetCheck = 0;
     int accoladeCheck = 0;
-    while(input->nextToken != NULL) {
-        if(strcmp(input->value, "(") == 0) parentheseCheck++;
-        if(strcmp(input->value, ")") == 0) {
+    while (input->nextToken != NULL) {
+        if (strcmp(input->value, "(") == 0) parentheseCheck++;
+        if (strcmp(input->value, ")") == 0) {
             parentheseCheck--;
-            if(parentheseCheck<0) error("Mauvaise gestion de parenthèse");
+            if (parentheseCheck < 0) error("Mauvaise gestion de parenthèse");
         }
 
-        if(strcmp(input->value, "[") == 0) crochetCheck++;
-        if(strcmp(input->value, "]") == 0) {
+        if (strcmp(input->value, "[") == 0) crochetCheck++;
+        if (strcmp(input->value, "]") == 0) {
             crochetCheck--;
             error("Mauvaise gestion de crochet");
         }
 
         input = nextToken(input);
     }
-    if(strcmp(input->value, ";") != 0 && strcmp(input->value, "}") != 0) error("; manquant");
-    if(parentheseCheck != 0 || accoladeCheck != 0 || crochetCheck != 0) error("Mauvaise gestion des delimiteurs");
+    if (strcmp(input->value, ";") != 0 && strcmp(input->value, "}") != 0) error("; manquant");
+    if (parentheseCheck != 0 || accoladeCheck != 0 || crochetCheck != 0) error("Mauvaise gestion des delimiteurs");
 }
 
-Token * checkPrint(Token *input) {
+Token *checkPrint(Token *input) {
     checkParentheses(input);
     int modulo2 = 0;
     while (input->nextToken != NULL) {
-        if(input->nextToken->type == SEMICOLON && input->type == RPAREN) {
+        if (input->nextToken->type == SEMICOLON && input->type == RPAREN) {
             return input;
         }
-        if(input->type == LPAREN || input->type == RPAREN) {
-            input=nextToken(input);
+        if (input->type == LPAREN || input->type == RPAREN) {
+            input = nextToken(input);
             continue;
         }
-        if(modulo2 % 2 == 0 && isOperator(input->type)) error("Operateur dans le mauvais ordre");
-        if(modulo2 % 2 == 1 && (input->type == IDENTIFIER || input->type == NUMBER || input->type==TOKENSTRING)) error("Operandes dans le mauvais ordre");
-        if(input->type != IDENTIFIER && input->type != NUMBER && !isOperator(input->type) && input->type!=TOKENSTRING) error("Mauvais type de donnee dans le calcul");
+        if (modulo2 % 2 == 0 && isOperator(input->type)) error("Operateur dans le mauvais ordre");
+        if (modulo2 % 2 == 1 && (input->type == IDENTIFIER || input->type == NUMBER || input->type == TOKENSTRING))
+            error("Operandes dans le mauvais ordre");
+        if (input->type != IDENTIFIER && input->type != NUMBER && !isOperator(input->type) && input->type !=
+            TOKENSTRING) error("Mauvais type de donnee dans le calcul");
         input = nextToken(input);
         modulo2++;
     }
@@ -588,19 +568,19 @@ int isValidateValue(Type type) {
     return type == IDENTIFIER || type == NUMBER || type == FALSE || type == TRUE || type == TOKENSTRING;
 }
 
-Token* checkIf(Token* input) {
-    checkParentheses(input);  
+Token *checkIf(Token *input) {
+    checkParentheses(input);
     int pair = 0;
     while (input != NULL) {
         if (input->type == LBRACE || input->type == RBRACE) {
             return input;
         }
         if (input->type == LPAREN || input->type == RPAREN) {
-            input = nextToken(input); 
+            input = nextToken(input);
             continue;
         }
 
-         if (pair % 2 == 0 && isOperator(input->type)) {
+        if (pair % 2 == 0 && isOperator(input->type)) {
             error("Opérateur dans le mauvais ordre dans la condition");
         }
         if (pair % 2 == 1 && (input->type == IDENTIFIER || input->type == NUMBER || input->type == TOKENSTRING)) {

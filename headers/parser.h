@@ -14,15 +14,15 @@ int calculShuttingYard(char *input);
 
 void error(char *msg);
 
-Token * nextToken(Token *input);
+Token *nextToken(Token *input);
 
-Token * checkCalcul(Token *input);
+Token *checkCalcul(Token *input);
 
 void checkParentheses(Token *input);
 
-Token * checkPrint(Token *input);
+Token *checkPrint(Token *input);
 
-Token* checkIf(Token *input);
+Token *checkIf(Token *input);
 
 
 // Analyse un nœud de type `while` et retourne le prochain token
@@ -46,7 +46,6 @@ ASTNode *parseExpression(Token **currentToken);
 ASTNode *createVariableOrNumberNode(Token **currentToken);
 
 void validateNodeType(NodeType type);
-
 
 
 #endif //PARSER_H

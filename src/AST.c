@@ -38,14 +38,14 @@ void printAST(ASTNode *node) {
     switch (node->type) {
         case NODE_TYPE_NUMBER:
             printf("%lf", node->number);
-        break;
+            break;
         case NODE_TYPE_OPERATION:
             printf("(");
-        printAST(node->operation.left);
-        printf(" %c ", node->operation.operator);
-        printAST(node->operation.right);
-        printf(")");
-        break;
+            printAST(node->operation.left);
+            printf(" %c ", node->operation.operator);
+            printAST(node->operation.right);
+            printf(")");
+            break;
     }
 }
 
@@ -68,7 +68,7 @@ void printASTGraphviz(ASTNode *node, int *counter) {
     if (node == NULL) return;
 
     char currentLabel[10];
-    generateNodeLabel(currentLabel, counter);  // Crée un label unique pour le nœud actuel
+    generateNodeLabel(currentLabel, counter); // Crée un label unique pour le nœud actuel
 
     // Affiche le nœud actuel en fonction de son type
     switch (node->type) {
@@ -129,9 +129,7 @@ void printASTGraphviz(ASTNode *node, int *counter) {
 
 // Fonction principale pour afficher l'AST
 void displayASTGraph(ASTNode *root) {
-    int counter = 0;  // Compteur de labels de nœuds pour garantir l'unicité
-    printf("graph TD\n");  // Préambule pour le format Graphviz
+    int counter = 0; // Compteur de labels de nœuds pour garantir l'unicité
+    printf("graph TD\n"); // Préambule pour le format Graphviz
     printASTGraphviz(root, &counter);
 }
-
-

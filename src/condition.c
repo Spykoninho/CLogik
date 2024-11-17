@@ -1,7 +1,7 @@
 #include "../headers/condition.h"
 
 int evaluateIfCondition(Token *token) {
-    if (token->type == TRUE)  return 1;
+    if (token->type == TRUE) return 1;
     if (token->type == FALSE) return 0;
 }
 

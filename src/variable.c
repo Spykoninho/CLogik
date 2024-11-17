@@ -266,7 +266,7 @@ Var *addVariable(Token *token) {
 Var *getVariable(Var *var, char *searchedVar) {
     while (var != NULL) {
         if (strcmp(var->name, searchedVar) == 0) {
-            if(var->scope > actualScope) error("Cette variable n'est pas atteignable");
+            if (var->scope > actualScope) error("Cette variable n'est pas atteignable");
             return var;
         }
         var = var->nextVar;
@@ -299,7 +299,7 @@ void freeVariable(Var *variable) {
 int isVarExists(Var *var, const char *searchedVar) {
     while (var != NULL) {
         if (strcmp(var->name, searchedVar) == 0) {
-            if(var->scope > actualScope) error("Cette variable n'est pas accessible");
+            if (var->scope > actualScope) error("Cette variable n'est pas accessible");
             return 1;
         }
         var = var->nextVar;

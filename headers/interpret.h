@@ -8,5 +8,6 @@
 #include "condition.h"
 
 void interpret(char *input);
-int userWantsToQuit(char* input);
+
+int userWantsToQuit(char *input);
 #endif //INTERPRET_H

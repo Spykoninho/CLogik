@@ -135,13 +135,13 @@ double calcul(Token *token) {
     while (actualStToken != NULL) {
         if (isOperator(actualStToken->type)) {
             // On récupère les deux derniers opérandes de la pile pour le calcul
-            Token *op2Token = stTokenPile;  // Le dernier opérande
+            Token *op2Token = stTokenPile; // Le dernier opérande
             if (stTokenPile == NULL || stTokenPile->previousToken == NULL) {
                 printf("Erreur, token manquant\n");
                 exit(0);
             }
             stTokenPile = stTokenPile->previousToken;
-            Token *op1Token = stTokenPile;  // L'avant-dernier opérande
+            Token *op1Token = stTokenPile; // L'avant-dernier opérande
             stTokenPile = stTokenPile->previousToken;
 
             // Convertir les opérandes en double pour le calcul
@@ -178,7 +178,7 @@ double calcul(Token *token) {
                         freeTokens(token);
                         exit(0);
                     }
-                    result = (long)operator1 % (long)operator2;
+                    result = (long) operator1 % (long) operator2;
                     break;
                 default:
                     printf("Mauvais opérateur\n");
@@ -186,10 +186,15 @@ double calcul(Token *token) {
             }
 
             // Crée un nœud d'AST pour l'opération
-            char operatorChar = actualStToken->type == PLUS ? '+' :
-                                actualStToken->type == MINUS ? '-' :
-                                actualStToken->type == MULT ? '*' :
-                                actualStToken->type == DIV ? '/' : '%';
+            char operatorChar = actualStToken->type == PLUS
+                                    ? '+'
+                                    : actualStToken->type == MINUS
+                                          ? '-'
+                                          : actualStToken->type == MULT
+                                                ? '*'
+                                                : actualStToken->type == DIV
+                                                      ? '/'
+                                                      : '%';
             ASTNode *rightNode = astStack[astStackTop--];
             ASTNode *leftNode = astStack[astStackTop--];
             ASTNode *operationNode = createOperationNode(operatorChar, leftNode, rightNode);

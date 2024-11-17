@@ -20,7 +20,7 @@ typedef struct Variable {
     struct Variable *nextVar;
 } Var;
 
-extern Var* variables;
+extern Var *variables;
 
 extern int astEnabled;
 

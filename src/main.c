@@ -48,7 +48,7 @@ int main(int argc, char *argv[]) {
 }
 
 int userWantsToQuit(char *input) {
-    char* ptr = strchr(input, '\n');
+    char *ptr = strchr(input, '\n');
     if (ptr) {
         // if new line found replace with null character
         *ptr = '\0';

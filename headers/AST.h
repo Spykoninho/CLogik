@@ -18,25 +18,27 @@ typedef enum {
 } NodeType;
 
 
-
 typedef struct ASTNode {
     NodeType type;
-    struct ASTNode * next;
+    struct ASTNode *next;
 
     union {
-        struct {  //calcul
+        struct {
+            //calcul
             struct ASTNode *left;
             struct ASTNode *right;
             char operator;
         } operation;
 
-        struct {  //if while
+        struct {
+            //if while
             struct ASTNode *condition;
             struct ASTNode *body;
             struct ASTNode *elseBody;
         } controlFlow;
 
-        struct {  // print
+        struct {
+            // print
             struct ASTNode *expression;
         } print;
 
